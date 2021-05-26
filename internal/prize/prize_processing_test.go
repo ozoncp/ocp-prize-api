@@ -6,9 +6,9 @@ import (
 )
 
 func TestSplitMultiplePrizeSlice(t *testing.T) {
-	testSlice := []Prize{NewPrize(1, "sale10"),
-		NewPrize(2, "sale10"), NewPrize(3, "sale10"),
-		NewPrize(4, "sale10"), NewPrize(5, "sale10"), NewPrize(6, "sale10")}
+	testSlice := []Prize{NewPrize(1, 2, "www"),
+		NewPrize(2, 2, "www"), NewPrize(3, 2, "www"),
+		NewPrize(4, 2, "www"), NewPrize(5, 2, "www"), NewPrize(6, 2, "www")}
 	var splittedSize int = 2
 	resultSlice, err := SplitPrizeSliceToBunches(testSlice, splittedSize)
 	if err != nil {
@@ -25,10 +25,9 @@ func TestSplitMultiplePrizeSlice(t *testing.T) {
 	}
 }
 func TestSplitNonMultiplePrizeSlice(t *testing.T) {
-	testSlice := []Prize{NewPrize(1, "sale10"),
-		NewPrize(2, "sale10"), NewPrize(3, "sale10"),
-		NewPrize(4, "sale10"), NewPrize(5, "sale10"), NewPrize(6, "sale10"),
-		NewPrize(7, "sale10")}
+	testSlice := []Prize{NewPrize(1, 2, "www"),
+		NewPrize(2, 2, "www"), NewPrize(3, 2, "www"),
+		NewPrize(4, 2, "www"), NewPrize(5, 2, "www")}
 	var splittedSize int = 2
 	resultSlice, err := SplitPrizeSliceToBunches(testSlice, splittedSize)
 	if err != nil {
@@ -46,35 +45,45 @@ func TestSplitNonMultiplePrizeSlice(t *testing.T) {
 }
 
 func TestPrizeSliceWithZeroSize(t *testing.T) {
-	testSlice := []Prize{NewPrize(1, "sale10"),
-		NewPrize(2, "sale10"), NewPrize(3, "sale10"),
-		NewPrize(4, "sale10"), NewPrize(5, "sale10"), NewPrize(6, "sale10")}
+	testSlice := []Prize{NewPrize(1, 2, "www"),
+		NewPrize(2, 2, "www"), NewPrize(3, 2, "www"),
+		NewPrize(4, 2, "www"), NewPrize(5, 2, "www"), NewPrize(6, 2, "www")}
 	resultSlice, err := SplitPrizeSliceToBunches(testSlice, 0)
 	if resultSlice != nil || err == nil {
 		t.Error("Incorrect working with zero size")
 	}
 }
 func TestPrizeSliceWithSizeEqualOrigin(t *testing.T) {
-	testSlice := []Prize{NewPrize(1, "sale10"),
-		NewPrize(2, "sale10"), NewPrize(3, "sale10"),
-		NewPrize(4, "sale10"), NewPrize(5, "sale10"), NewPrize(6, "sale10")}
+	testSlice := []Prize{NewPrize(1, 2, "www"),
+		NewPrize(2, 2, "www"), NewPrize(3, 2, "www"),
+		NewPrize(4, 2, "www"), NewPrize(5, 2, "www"), NewPrize(6, 2, "www")}
 	resultSlice, err := SplitPrizeSliceToBunches(testSlice, len(testSlice))
 	result := reflect.DeepEqual(resultSlice[0], testSlice)
-	if !result || err == nil {
+	if !result || err != nil {
 		t.Error("Incorrect splitting with size equal origin size")
 	}
 }
 
+func TestPrizeSliceWithSizeMoreThanOrigin(t *testing.T) {
+	testSlice := []Prize{NewPrize(1, 2, "www"),
+		NewPrize(2, 2, "www"), NewPrize(3, 2, "www"),
+		NewPrize(4, 2, "www"), NewPrize(5, 2, "www"), NewPrize(6, 2, "www")}
+	resultSlice, err := SplitPrizeSliceToBunches(testSlice, len(testSlice)+1)
+	if resultSlice != nil || err == nil {
+		t.Error("Incorrect splitting with size more than origin size")
+	}
+}
+
 func TestPrizeSliceToMap(t *testing.T) {
-	testSlice := []Prize{NewPrize(1, "sale10"),
-		NewPrize(2, "sale10"), NewPrize(3, "sale10"),
-		NewPrize(4, "sale10"), NewPrize(5, "sale10"), NewPrize(6, "sale10")}
+	testSlice := []Prize{NewPrize(1, 2, "www"),
+		NewPrize(2, 2, "www"), NewPrize(3, 2, "www"),
+		NewPrize(4, 2, "www"), NewPrize(5, 2, "www"), NewPrize(6, 2, "www")}
 	resultMap, err := PrizeSliceToMap(testSlice)
 	if err != nil {
 		t.Error(err.Error())
 	}
 	for _, prize := range testSlice {
-		if !reflect.DeepEqual(resultMap[prize.IDPrize], prize) {
+		if !reflect.DeepEqual(resultMap[prize.ID], prize) {
 			t.Error("Incorrect result map")
 		}
 	}

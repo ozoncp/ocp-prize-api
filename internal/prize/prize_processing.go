@@ -6,9 +6,7 @@ func SplitPrizeSliceToBunches(prizes []Prize, bunchSize int) (splittedPrizes [][
 	if bunchSize == 0 {
 		return splittedPrizes, errors.New("size of required bunch is zero")
 	}
-	if bunchSize >= len(prizes) {
-		splittedPrizes = make([][]Prize, 1)
-		splittedPrizes[0] = prizes
+	if bunchSize > len(prizes) {
 		return splittedPrizes, errors.New("size of required bunch is more than origin slice")
 	}
 	splittedSize := len(prizes) / bunchSize
@@ -31,7 +29,7 @@ func PrizeSliceToMap(prizeSlice []Prize) (prizeMap map[uint64]Prize, err error) 
 	}
 	prizeMap = map[uint64]Prize{}
 	for _, prize := range prizeSlice {
-		prizeMap[prize.IDPrize] = prize
+		prizeMap[prize.ID] = prize
 	}
 	return
 }

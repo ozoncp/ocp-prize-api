@@ -1,39 +1,25 @@
 package prize
 
 import (
-	"errors"
 	"fmt"
 )
 
 type Prize struct {
-	IDPrize     uint64
-	Name        string
-	Description string
-	Probability uint // In percentage
+	ID      uint64
+	IssueID uint64
+	Link    string
 }
 
-func NewPrize(id uint64, name string) (newPrize Prize) {
-	newPrize.IDPrize = id
-	newPrize.Name = name
+func NewPrize(id uint64, issueID uint64, link string) (newPrize Prize) {
+	newPrize.ID = id
+	newPrize.IssueID = issueID
+	newPrize.Link = link
 	return
 }
 
-func (prize *Prize) SetDescription(description string) {
-	prize.Description = description
-}
-
-func (prize *Prize) GetDescription() string {
-	return prize.Description
-}
-
-func (prize *Prize) SetProbability(probability uint) error {
-	if probability > 100 {
-		return errors.New("incorrect probability: should be from 0 to 100 percent")
-	}
-	prize.Probability = probability
-	return nil
-}
-
-func (prize *Prize) String() string {
-	return fmt.Sprint(prize.IDPrize) + " " + prize.Name + " " + prize.Description
+func (prize *Prize) String() (outString string) {
+	outString += "ID:" + " " + fmt.Sprint(prize.ID)
+	outString += " " + "IssueID:" + " " + fmt.Sprint(prize.IssueID)
+	outString += " " + "Link:" + " " + prize.Link
+	return
 }
