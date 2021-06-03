@@ -1,42 +1,47 @@
 package flusher
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/ozoncp/ocp-prize-api/internal/prize"
 	"github.com/ozoncp/ocp-prize-api/internal/repo"
 )
 
-// Flusher for prize
-type Flusher interface {
-	Flush(prize []prize.Prize) []prize.Prize
+// IFlusher for prize
+type IFlusher interface {
+	Flush(prize []prize.Prize) ([]prize.Prize, error)
 }
 
-type flusher struct {
-	repo      repo.Repo
+// Flusher struct
+type Flusher struct {
+	repo      repo.IRepo
 	chunkSize int
 }
 
 // NewFlusher create new flusher
-func NewFlusher(originRepo repo.Repo, chSize int) Flusher {
-	return &flusher{
+func NewFlusher(originRepo repo.IRepo, chSize int) IFlusher {
+	return &Flusher{
 		repo:      originRepo,
 		chunkSize: chSize,
 	}
 }
 
 // Flush prizes in repo
-func (originFlusher *flusher) Flush(prizes []prize.Prize) []prize.Prize {
-	if originFlusher.chunkSize > len(prizes) {
-		originFlusher.chunkSize = len(prizes)
+func (originFlusher *Flusher) Flush(prizes []prize.Prize) ([]prize.Prize, error) {
+	chunkSizeToSplit := originFlusher.chunkSize
+	if chunkSizeToSplit > len(prizes) {
+		chunkSizeToSplit = len(prizes)
 	}
-	butchedPrizes, err := prize.SplitPrizeSliceToBunches(prizes, originFlusher.chunkSize)
+	butchedPrizes, err := prize.SplitPrizeSliceToBunches(prizes, chunkSizeToSplit)
 	if err != nil {
-		return prizes
+		return prizes, errors.New(err.Error())
 	}
 	for i, batchToAdd := range butchedPrizes {
 		err := originFlusher.repo.AddPrizes(batchToAdd)
 		if err != nil {
-			return prizes[i*originFlusher.chunkSize:]
+			return prizes[i*chunkSizeToSplit:], errors.New("error writing prizes from:" + fmt.Sprint(i*chunkSizeToSplit))
 		}
 	}
-	return nil
+	return nil, nil
 }

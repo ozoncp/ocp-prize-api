@@ -15,17 +15,18 @@ import (
 var _ = Describe("Flusher", func() {
 	var (
 		ctrl        *gomock.Controller
-		mockRepo    *mocks.MockRepo
-		testFlusher flusher.Flusher
+		mockRepo    *mocks.MockIRepo
+		testFlusher flusher.IFlusher
 
 		prizesToAdd []prize.Prize
 		leftPrizes  []prize.Prize
+		errorFlush  error
 	)
 
 	BeforeEach(func() {
 		ctrl = gomock.NewController(GinkgoT())
 
-		mockRepo = mocks.NewMockRepo(ctrl)
+		mockRepo = mocks.NewMockIRepo(ctrl)
 	})
 
 	Context("correct flushing prizes", func() {
@@ -38,10 +39,11 @@ var _ = Describe("Flusher", func() {
 			mockRepo.EXPECT().AddPrizes(gomock.Any()).Return(nil).MinTimes(1)
 		})
 
-		It("", func() {
+		It("Test flushing with correct input", func() {
 			testFlusher = flusher.NewFlusher(mockRepo, 3)
-			leftPrizes = testFlusher.Flush(prizesToAdd)
+			leftPrizes, errorFlush = testFlusher.Flush(prizesToAdd)
 			Expect(leftPrizes).Should(BeNil())
+			Expect(errorFlush).Should(BeNil())
 		})
 	})
 
@@ -55,10 +57,11 @@ var _ = Describe("Flusher", func() {
 			mockRepo.EXPECT().AddPrizes(gomock.Any()).Return(errors.New("add prize error")).MinTimes(1)
 		})
 
-		It("", func() {
+		It("Test flushing with error at first try to add bunch", func() {
 			testFlusher = flusher.NewFlusher(mockRepo, 3)
-			leftPrizes = testFlusher.Flush(prizesToAdd)
+			leftPrizes, errorFlush = testFlusher.Flush(prizesToAdd)
 			Expect(leftPrizes).Should(BeEquivalentTo(prizesToAdd))
+			Expect(errorFlush).ShouldNot(BeNil())
 		})
 	})
 
@@ -74,10 +77,11 @@ var _ = Describe("Flusher", func() {
 			)
 		})
 
-		It("", func() {
+		It("Test flushing with error at second try to add bunch", func() {
 			testFlusher = flusher.NewFlusher(mockRepo, 3)
-			leftPrizes = testFlusher.Flush(prizesToAdd)
+			leftPrizes, errorFlush = testFlusher.Flush(prizesToAdd)
 			Expect(len(leftPrizes)).Should(BeEquivalentTo(2))
+			Expect(errorFlush).ShouldNot(BeNil())
 		})
 	})
 
