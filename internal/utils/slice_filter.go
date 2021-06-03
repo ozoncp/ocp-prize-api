@@ -2,6 +2,7 @@ package utils
 
 var originList = [...]int{2, 4, 6, 8, 10, 12}
 
+// FilterSlice filter out slice according to setted list
 func FilterSlice(inputSlice []uint) (filteredSlice []uint) {
 	isInOriginList := func(valueToSearch uint) bool {
 		for _, value := range originList {

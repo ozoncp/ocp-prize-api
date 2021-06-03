@@ -1,5 +1,6 @@
 package utils
 
+// SplitSlice split slice into bunches
 func SplitSlice(originSlice []uint, size int) (splittedSlice [][]uint) {
 	if size == 0 {
 		return

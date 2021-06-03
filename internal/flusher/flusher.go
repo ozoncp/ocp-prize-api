@@ -5,6 +5,7 @@ import (
 	"github.com/ozoncp/ocp-prize-api/internal/repo"
 )
 
+// Flusher for prize
 type Flusher interface {
 	Flush(prize []prize.Prize) []prize.Prize
 }
@@ -14,6 +15,7 @@ type flusher struct {
 	chunkSize int
 }
 
+// NewFlusher create new flusher
 func NewFlusher(originRepo repo.Repo, chSize int) Flusher {
 	return &flusher{
 		repo:      originRepo,
@@ -21,6 +23,7 @@ func NewFlusher(originRepo repo.Repo, chSize int) Flusher {
 	}
 }
 
+// Flush prizes in repo
 func (originFlusher *flusher) Flush(prizes []prize.Prize) []prize.Prize {
 	if originFlusher.chunkSize > len(prizes) {
 		originFlusher.chunkSize = len(prizes)
