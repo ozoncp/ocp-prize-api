@@ -78,7 +78,7 @@ func TestPrizeSliceToMap(t *testing.T) {
 	testSlice := []Prize{NewPrize(1, 2, "www"),
 		NewPrize(2, 2, "www"), NewPrize(3, 2, "www"),
 		NewPrize(4, 2, "www"), NewPrize(5, 2, "www"), NewPrize(6, 2, "www")}
-	resultMap, err := PrizeSliceToMap(testSlice)
+	resultMap, err := SlicePrizeToMap(testSlice)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -91,7 +91,7 @@ func TestPrizeSliceToMap(t *testing.T) {
 
 func TestNilPrizeSliceToMap(t *testing.T) {
 	var testSlice []Prize
-	resultMap, err := PrizeSliceToMap(testSlice)
+	resultMap, err := SlicePrizeToMap(testSlice)
 	if resultMap != nil || err == nil {
 		t.Error("Incorrect working nil slice")
 	}
@@ -99,7 +99,7 @@ func TestNilPrizeSliceToMap(t *testing.T) {
 
 func TestEmptyPrizeSliceToMap(t *testing.T) {
 	var testSlice = []Prize{}
-	resultMap, err := PrizeSliceToMap(testSlice)
+	resultMap, err := SlicePrizeToMap(testSlice)
 	if resultMap != nil || err == nil {
 		t.Error("Incorrect working empty slice")
 	}
