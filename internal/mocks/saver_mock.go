@@ -49,10 +49,10 @@ func (mr *MockISaverMockRecorder) Close() *gomock.Call {
 }
 
 // GetState mocks base method
-func (m *MockISaver) GetState() saver.SaverState {
+func (m *MockISaver) GetState() saver.State {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetState")
-	ret0, _ := ret[0].(saver.SaverState)
+	ret0, _ := ret[0].(saver.State)
 	return ret0
 }
 
