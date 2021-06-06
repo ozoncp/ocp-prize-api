@@ -2,7 +2,6 @@ package saver
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
@@ -10,16 +9,19 @@ import (
 	"github.com/ozoncp/ocp-prize-api/internal/prize"
 )
 
-type SaverResultCode int
+// ResultCode for saver state
+type ResultCode int
 
 const (
-	OKSaverResultCode SaverResultCode = iota
+	//OKSaverResultCode is setted if all data saved without errors
+	OKSaverResultCode ResultCode = iota
+	// ErrorSaverResultCode is setted if there are errors with saving data
 	ErrorSaverResultCode
 )
 
-// SaveResult to write in result channel
-type SaverState struct {
-	ResultCode    SaverResultCode
+// State to write in result channel
+type State struct {
+	ResultCode    ResultCode
 	ErrorOfSaving error
 	LostedData    uint64
 }
@@ -29,7 +31,7 @@ type ISaver interface {
 	Save(prizeToSave prize.Prize) error
 	Init() error
 	Close() error
-	GetState() SaverState
+	GetState() State
 }
 
 // Saver for prize buffer
@@ -38,7 +40,7 @@ type Saver struct {
 	flusher         flusher.IFlusher
 	timeout         int
 	ticker          *time.Ticker
-	state           SaverState
+	state           State
 	doneChannel     chan struct{}
 	bufferMutex     sync.Mutex
 	buffer          []prize.Prize
@@ -68,7 +70,7 @@ func (originSaver *Saver) Init() error {
 	}
 	originSaver.buffer = make([]prize.Prize, 0, originSaver.capacity)
 	originSaver.doneChannel = make(chan struct{})
-	originSaver.state = SaverState{
+	originSaver.state = State{
 		ResultCode:    OKSaverResultCode,
 		ErrorOfSaving: nil,
 	}
@@ -82,42 +84,31 @@ func (originSaver *Saver) Init() error {
 func (originSaver *Saver) savingLoop() {
 	originSaver.ticker = time.NewTicker(1000)
 
-	fmt.Println("Start loop")
 	for {
 		select {
 		case <-originSaver.ticker.C:
 
-			fmt.Println("Timer ticked Len prizes", len(originSaver.buffer))
 			if len(originSaver.buffer) == 0 {
 				continue
 			}
 			originSaver.bufferMutex.Lock()
-			fmt.Println("Loop mutex lock")
 			leftPrizes, err := originSaver.flusher.Flush(originSaver.buffer)
-			fmt.Println("Flush ok")
 			if leftPrizes != nil {
 				originSaver.buffer = make([]prize.Prize, 0, originSaver.capacity)
 				originSaver.buffer = append(originSaver.buffer, leftPrizes...)
 				originSaver.state.ResultCode = ErrorSaverResultCode
 				originSaver.state.ErrorOfSaving = errors.New("prizes to save left")
-				fmt.Println("Prizes left")
 			} else {
 				originSaver.buffer = make([]prize.Prize, 0, originSaver.capacity)
 				originSaver.state.ResultCode = OKSaverResultCode
 				originSaver.state.ErrorOfSaving = nil
-				fmt.Println("Prizes not left")
 			}
 			originSaver.shiftOverriting = 0
-			fmt.Println("Loop mutex try unlock")
 			originSaver.bufferMutex.Unlock()
-			fmt.Println("Loop mutex unlock")
 			if err != nil {
-
-				fmt.Println("Error saving")
 				continue
 			}
 		case <-originSaver.doneChannel:
-			fmt.Println("CloseChannel")
 			return
 		}
 	}
@@ -125,10 +116,7 @@ func (originSaver *Saver) savingLoop() {
 
 //Save Add prize to buffer for save by timeout
 func (originSaver *Saver) Save(prizeToSave prize.Prize) error {
-
-	fmt.Println("Save prize%i", prizeToSave.ID)
 	originSaver.bufferMutex.Lock()
-	fmt.Println("Save mutex lock")
 	if len(originSaver.buffer) == originSaver.capacity {
 		originSaver.buffer[originSaver.shiftOverriting] = prizeToSave
 		originSaver.shiftOverriting++
@@ -137,20 +125,18 @@ func (originSaver *Saver) Save(prizeToSave prize.Prize) error {
 		originSaver.buffer = append(originSaver.buffer, prizeToSave)
 	}
 	originSaver.bufferMutex.Unlock()
-	fmt.Println("Save mutex unlock")
 	return nil
 }
 
 // Close Saver and stop saving by timeout
 func (originSaver *Saver) Close() error {
-	fmt.Println("Close func")
 	originSaver.ticker.Stop()
 	originSaver.doneChannel <- struct{}{}
 	close(originSaver.doneChannel)
 	return nil
 }
 
-// GetResult by order from result channel
-func (originSaver *Saver) GetState() SaverState {
+// GetState by order from result channel
+func (originSaver *Saver) GetState() State {
 	return originSaver.state
 }

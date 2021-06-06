@@ -42,7 +42,8 @@ var _ = Describe("Saver", func() {
 			err := testSaver.Init()
 			Expect(err).Should(BeNil())
 			for _, currentPrize := range prizesToAdd {
-				testSaver.Save(currentPrize)
+				errSave := testSaver.Save(currentPrize)
+				Expect(errSave).Should(BeNil())
 			}
 			time.Sleep(400000)
 			testSaver.Close()
@@ -63,7 +64,8 @@ var _ = Describe("Saver", func() {
 			err := testSaver.Init()
 			Expect(err).Should(BeNil())
 			for _, currentPrize := range prizesToAdd {
-				testSaver.Save(currentPrize)
+				errSave := testSaver.Save(currentPrize)
+				Expect(errSave).Should(BeNil())
 			}
 			time.Sleep(400000)
 			testSaver.Close()
@@ -88,7 +90,8 @@ var _ = Describe("Saver", func() {
 			err := testSaver.Init()
 			Expect(err).Should(BeNil())
 			for _, currentPrize := range prizesToAdd {
-				testSaver.Save(currentPrize)
+				errSave := testSaver.Save(currentPrize)
+				Expect(errSave).Should(BeNil())
 			}
 			time.Sleep(400000)
 			testSaver.Close()
