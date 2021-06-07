@@ -38,14 +38,14 @@ var _ = Describe("Saver", func() {
 		})
 
 		It("Test with correct saving", func() {
-			testSaver = saver.NewSaver(10, mockFlusher, 100000)
+			testSaver = saver.NewSaver(10, mockFlusher, 100*time.Millisecond)
 			err := testSaver.Init()
 			Expect(err).Should(BeNil())
 			for _, currentPrize := range prizesToAdd {
 				errSave := testSaver.Save(currentPrize)
 				Expect(errSave).Should(BeNil())
 			}
-			time.Sleep(400000)
+			time.Sleep(400 * time.Millisecond)
 			testSaver.Close()
 			state := testSaver.GetState()
 			Expect(state.ResultCode).Should(BeEquivalentTo(saver.OKSaverResultCode))
@@ -54,20 +54,20 @@ var _ = Describe("Saver", func() {
 		})
 
 		It("Test with incorrect init", func() {
-			testSaver = saver.NewSaver(0, mockFlusher, 100000)
+			testSaver = saver.NewSaver(0, mockFlusher, 1*time.Second)
 			err := testSaver.Init()
 			Expect(err).ShouldNot(BeNil())
 		})
 
 		It("Test with oversaving data", func() {
-			testSaver = saver.NewSaver(3, mockFlusher, 100000)
+			testSaver = saver.NewSaver(3, mockFlusher, 100*time.Millisecond)
 			err := testSaver.Init()
 			Expect(err).Should(BeNil())
 			for _, currentPrize := range prizesToAdd {
 				errSave := testSaver.Save(currentPrize)
 				Expect(errSave).Should(BeNil())
 			}
-			time.Sleep(400000)
+			time.Sleep(400 * time.Millisecond)
 			testSaver.Close()
 			state := testSaver.GetState()
 			Expect(state.ResultCode).Should(BeEquivalentTo(saver.OKSaverResultCode))
@@ -86,14 +86,14 @@ var _ = Describe("Saver", func() {
 		})
 
 		It("Test error saving", func() {
-			testSaver = saver.NewSaver(10, mockFlusher, 100000)
+			testSaver = saver.NewSaver(10, mockFlusher, 100*time.Millisecond)
 			err := testSaver.Init()
 			Expect(err).Should(BeNil())
 			for _, currentPrize := range prizesToAdd {
 				errSave := testSaver.Save(currentPrize)
 				Expect(errSave).Should(BeNil())
 			}
-			time.Sleep(400000)
+			time.Sleep(400 * time.Millisecond)
 			testSaver.Close()
 			state := testSaver.GetState()
 			Expect(state.ResultCode).Should(BeEquivalentTo(saver.ErrorSaverResultCode))

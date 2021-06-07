@@ -38,7 +38,7 @@ type ISaver interface {
 type Saver struct {
 	capacity        int
 	flusher         flusher.IFlusher
-	timeout         int
+	timeout         time.Duration
 	ticker          *time.Ticker
 	state           State
 	doneChannel     chan struct{}
@@ -51,7 +51,7 @@ type Saver struct {
 func NewSaver(
 	capacity int,
 	flusher flusher.IFlusher,
-	timeout int,
+	timeout time.Duration,
 ) ISaver {
 	return &Saver{
 		capacity: capacity,
@@ -82,7 +82,7 @@ func (originSaver *Saver) Init() error {
 
 // savingLoop for flushing data by timeout
 func (originSaver *Saver) savingLoop() {
-	originSaver.ticker = time.NewTicker(1000)
+	originSaver.ticker = time.NewTicker(originSaver.timeout)
 
 	for {
 		select {
@@ -97,7 +97,7 @@ func (originSaver *Saver) savingLoop() {
 				originSaver.buffer = make([]prize.Prize, 0, originSaver.capacity)
 				originSaver.buffer = append(originSaver.buffer, leftPrizes...)
 				originSaver.state.ResultCode = ErrorSaverResultCode
-				originSaver.state.ErrorOfSaving = errors.New("prizes to save left")
+				originSaver.state.ErrorOfSaving = err
 			} else {
 				originSaver.buffer = make([]prize.Prize, 0, originSaver.capacity)
 				originSaver.state.ResultCode = OKSaverResultCode
@@ -105,9 +105,6 @@ func (originSaver *Saver) savingLoop() {
 			}
 			originSaver.shiftOverriting = 0
 			originSaver.bufferMutex.Unlock()
-			if err != nil {
-				continue
-			}
 		case <-originSaver.doneChannel:
 			return
 		}
