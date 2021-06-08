@@ -115,6 +115,9 @@ func (originSaver *Saver) savingLoop() {
 func (originSaver *Saver) Save(prizeToSave prize.Prize) error {
 	originSaver.bufferMutex.Lock()
 	if len(originSaver.buffer) == originSaver.capacity {
+		if originSaver.shiftOverriting >= originSaver.capacity {
+			originSaver.shiftOverriting = 0
+		}
 		originSaver.buffer[originSaver.shiftOverriting] = prizeToSave
 		originSaver.shiftOverriting++
 		originSaver.state.LostedData++

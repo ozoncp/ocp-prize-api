@@ -74,6 +74,24 @@ var _ = Describe("Saver", func() {
 			Expect(state.ErrorOfSaving).Should(BeNil())
 			Expect(state.LostedData).ShouldNot(BeEquivalentTo(0))
 		})
+
+		It("Test with highload oversaving data", func() {
+			testSaver = saver.NewSaver(3, mockFlusher, 100*time.Millisecond)
+			err := testSaver.Init()
+			Expect(err).Should(BeNil())
+			for i := 0; i < 100; i++ {
+				for _, currentPrize := range prizesToAdd {
+					errSave := testSaver.Save(currentPrize)
+					Expect(errSave).Should(BeNil())
+				}
+			}
+			time.Sleep(400 * time.Millisecond)
+			testSaver.Close()
+			state := testSaver.GetState()
+			Expect(state.ResultCode).Should(BeEquivalentTo(saver.OKSaverResultCode))
+			Expect(state.ErrorOfSaving).Should(BeNil())
+			Expect(state.LostedData).ShouldNot(BeEquivalentTo(0))
+		})
 	})
 	Context("Test saving prizes with error flush", func() {
 
