@@ -118,4 +118,38 @@ var _ = Describe("Saver", func() {
 			Expect(state.ErrorOfSaving).ShouldNot(BeNil())
 		})
 	})
+
+	Context("Test init and close", func() {
+
+		BeforeEach(func() {
+			prizesToAdd = []prize.Prize{prize.NewPrize(1, 2, "www"),
+				prize.NewPrize(2, 2, "www"), prize.NewPrize(3, 2, "www"),
+				prize.NewPrize(4, 2, "www"), prize.NewPrize(5, 2, "www")}
+
+			mockFlusher.EXPECT().Flush(gomock.Any()).Return(prizesToAdd, errors.New("error flushing")).MinTimes(1)
+		})
+
+		It("Test with triple init", func() {
+			testSaver = saver.NewSaver(0, mockFlusher, 1*time.Second)
+			err := testSaver.Init()
+			Expect(err).ShouldNot(BeNil())
+			err = testSaver.Init()
+			Expect(err).ShouldNot(BeNil())
+			err = testSaver.Init()
+			Expect(err).ShouldNot(BeNil())
+		})
+
+		It("Test with triple close", func() {
+			testSaver = saver.NewSaver(0, mockFlusher, 1*time.Second)
+			err := testSaver.Init()
+			Expect(err).ShouldNot(BeNil())
+			err = testSaver.Close()
+			Expect(err).ShouldNot(BeNil())
+			err = testSaver.Close()
+			Expect(err).ShouldNot(BeNil())
+			err = testSaver.Close()
+			Expect(err).ShouldNot(BeNil())
+		})
+	})
+
 })

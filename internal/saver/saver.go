@@ -24,6 +24,7 @@ type State struct {
 	ResultCode    ResultCode
 	ErrorOfSaving error
 	LostedData    uint64
+	IsWorking     bool
 }
 
 // ISaver interface for prize Saver
@@ -57,6 +58,11 @@ func NewSaver(
 		capacity: capacity,
 		flusher:  flusher,
 		timeout:  timeout,
+		state: State{
+			ResultCode:    OKSaverResultCode,
+			ErrorOfSaving: nil,
+			IsWorking:     false,
+		},
 	}
 }
 
@@ -68,12 +74,11 @@ func (originSaver *Saver) Init() error {
 	if originSaver.timeout < 1 {
 		return errors.New("incorrect timeout for saver")
 	}
+	if originSaver.state.IsWorking {
+		return errors.New("saver already inited")
+	}
 	originSaver.buffer = make([]prize.Prize, 0, originSaver.capacity)
 	originSaver.doneChannel = make(chan struct{})
-	originSaver.state = State{
-		ResultCode:    OKSaverResultCode,
-		ErrorOfSaving: nil,
-	}
 	originSaver.bufferMutex = sync.Mutex{}
 	originSaver.shiftOverriting = 0
 	go originSaver.savingLoop()
@@ -83,6 +88,7 @@ func (originSaver *Saver) Init() error {
 // savingLoop for flushing data by timeout
 func (originSaver *Saver) savingLoop() {
 	originSaver.ticker = time.NewTicker(originSaver.timeout)
+	originSaver.state.IsWorking = true
 
 	for {
 		select {
@@ -130,9 +136,14 @@ func (originSaver *Saver) Save(prizeToSave prize.Prize) error {
 
 // Close Saver and stop saving by timeout
 func (originSaver *Saver) Close() error {
-	originSaver.ticker.Stop()
-	originSaver.doneChannel <- struct{}{}
-	close(originSaver.doneChannel)
+	if originSaver.state.IsWorking {
+		originSaver.ticker.Stop()
+		originSaver.doneChannel <- struct{}{}
+		close(originSaver.doneChannel)
+		originSaver.state.IsWorking = false
+	} else {
+		return errors.New("saver already closed")
+	}
 	return nil
 }
 
