@@ -18,6 +18,8 @@ require (
 	google.golang.org/grpc v1.38.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	github.com/onsi/ginkgo v1.16.4
+	github.com/onsi/gomega v1.13.0
 )
 
 replace github.com/ozoncp/ocp-prize-api/pkg/ocp-prize-api => ./pkg/ocp-prize-api
