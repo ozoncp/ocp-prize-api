@@ -14,7 +14,7 @@ require (
 	github.com/onsi/gomega v1.13.0
 	github.com/ozoncp/ocp-prize-api/pkg/ocp-prize-api v0.0.0-00010101000000-000000000000
 	github.com/rs/zerolog v1.22.0
-	google.golang.org/genproto v0.0.0-20210608205507-b6d2f5bf0d7d
+	google.golang.org/genproto v0.0.0-20210610141715-e7a9b787a5a4
 	google.golang.org/grpc v1.38.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0 // indirect
 )

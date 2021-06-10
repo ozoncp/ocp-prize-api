@@ -29,7 +29,7 @@ PHONY: .generate
 
 PHONY: .build
 .build:
-		go build -o cmd/ozon-prize-api cmd/ozon-prize-api/main.go
+		go build -o cmd/ocp-prize-api cmd/ocp-prize-api/main.go
 
 PHONY: install
 install: build .install

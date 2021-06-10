@@ -7,32 +7,32 @@ package ocp.prize.api;
 
 option go_package = "gihtub.com/ozoncp/ocp-prize-api/pkg/ocp-prize-api;ocp_prize_api";
 
-// Описание задачи
+// Description of prize
 
 service OcpPrizeApi {
 
-    // Возвращает список задач
+    // Return list of prize
     rpc ListPrizeV1(ListPrizeV1Request) returns (ListPrizeV1Response) {
         option (google.api.http) = {
             get: "/v1/prizes"
         };
     }
 
-    // Возвращает описание задачи по ее идентификатору
+    // Return description of prize by id
     rpc DescribePrizeV1(DescribePrizeV1Request) returns (DescribePrizeV1Response) {
         option (google.api.http) = {
             get: "/v1/prizes/{prize_id}"
         };
     }
 
-    // Создает новую задачу
+    // Сreate new prize
     rpc CreatePrizeV1(CreatePrizeV1Request) returns (CreatePrizeV1Response) {
         option (google.api.http) = {
             post: "/v1/prizes"
         };
     }
 
-    // Удаляет задачу по идентификатору
+    // Delete prize by id
     rpc RemovePrizeV1(RemovePrizeV1Request) returns (RemovePrizeV1Response) {
         option (google.api.http) = {
             delete: "/v1/prizes/{prize_id}"
@@ -59,7 +59,7 @@ message CreatePrizeV1Response {
 }
 
 message RemovePrizeV1Request {
-		uint64 prize_id = 1 [(validate.rules).uint64.gt = 0];
+	uint64 prize_id = 1 [(validate.rules).uint64.gt = 0];
 }
 
 message RemovePrizeV1Response {
@@ -67,7 +67,7 @@ message RemovePrizeV1Response {
 }
 
 message DescribePrizeV1Request {
-		uint64 prize_id = 1 [(validate.rules).uint64.gt = 0];
+	uint64 prize_id = 1 [(validate.rules).uint64.gt = 0];
 }
 
 message DescribePrizeV1Response {
