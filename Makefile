@@ -1,14 +1,17 @@
 run:
-	go run cmd/ozon-prize-api/main.go
+	go run cmd/ocp-prize-api/main.go
 
 lint:
-	golint ./...
+	golangci-lint run
 
 test:
 	go test -v ./...
 
 .PHONY: build
 build: vendor-proto .generate .build
+
+.PHONY: generate
+generate: .generate
 
 PHONY: .generate
 .generate:
@@ -62,9 +65,10 @@ install-go-deps: .install-go-deps
 
 .PHONY: .install-go-deps
 .install-go-deps:
-		ls go.mod || go mod init
+		ls go.mod || go mod init github.com/ozoncp/ocp-prize-api/
 		go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 		go get -u github.com/golang/protobuf/proto
 		go get -u github.com/golang/protobuf/protoc-gen-go
 		go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 		go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+		export PATH="$PATH:$(go env GOPATH)/bin"
