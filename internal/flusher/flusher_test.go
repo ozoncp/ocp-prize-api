@@ -39,7 +39,7 @@ var _ = Describe("Flusher", func() {
 				prize.NewPrize(2, 2, "www"), prize.NewPrize(3, 2, "www"),
 				prize.NewPrize(4, 2, "www"), prize.NewPrize(5, 2, "www")}
 
-			mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return(nil).MinTimes(1)
+			mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return(uint64(1), nil).MinTimes(1)
 		})
 
 		It("Test flushing with correct input", func() {
@@ -57,7 +57,7 @@ var _ = Describe("Flusher", func() {
 				prize.NewPrize(2, 2, "www"), prize.NewPrize(3, 2, "www"),
 				prize.NewPrize(4, 2, "www"), prize.NewPrize(5, 2, "www")}
 
-			mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return(errors.New("add prize error")).MinTimes(1)
+			mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return(uint64(0), errors.New("add prize error")).MinTimes(1)
 		})
 
 		It("Test flushing with error at first try to add bunch", func() {
@@ -75,8 +75,8 @@ var _ = Describe("Flusher", func() {
 				prize.NewPrize(2, 2, "www"), prize.NewPrize(3, 2, "www"),
 				prize.NewPrize(4, 2, "www"), prize.NewPrize(5, 2, "www")}
 			gomock.InOrder(
-				mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return(nil).Times(1),
-				mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return(errors.New("add prize error")).Times(1),
+				mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return(uint64(1), nil).Times(1),
+				mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return(uint64(0), errors.New("add prize error")).Times(1),
 			)
 		})
 

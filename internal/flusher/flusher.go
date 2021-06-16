@@ -39,7 +39,7 @@ func (originFlusher *Flusher) Flush(ctx context.Context, prizes []prize.Prize) (
 		return prizes, errors.New(err.Error())
 	}
 	for i, batchToAdd := range butchedPrizes {
-		err := originFlusher.repo.AddPrizes(ctx, batchToAdd)
+		_, err := originFlusher.repo.AddPrizes(ctx, batchToAdd)
 		if err != nil {
 			return prizes[i*chunkSizeToSplit:], errors.New("error writing prizes from:" + fmt.Sprint(i*chunkSizeToSplit))
 		}

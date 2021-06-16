@@ -46,10 +46,8 @@ var _ = Describe("Api", func() {
 				Link:    "www",
 				IssueId: 1,
 			}
-			rows := sqlmock.NewRows([]string{"id"}).
-				AddRow(1)
-			mock.ExpectQuery("INSERT INTO prizes").
-				WithArgs(request.Link, request.IssueId).WillReturnRows(rows)
+			mock.ExpectExec("INSERT INTO prizes").
+				WithArgs(request.Link, request.IssueId).WillReturnResult(sqlmock.NewResult(1, 1))
 			testApi = api.NewOcpPrizeApi(sqlxDB)
 			Expect(testApi).ShouldNot(BeNil())
 
@@ -63,7 +61,7 @@ var _ = Describe("Api", func() {
 				Link:    "www",
 				IssueId: 1,
 			}
-			mock.ExpectQuery("INSERT INTO prizes").
+			mock.ExpectExec("INSERT INTO prizes").
 				WithArgs(request.Link, request.IssueId).WillReturnError(errors.New("can't insert prize"))
 			testApi = api.NewOcpPrizeApi(sqlxDB)
 			Expect(testApi).ShouldNot(BeNil())

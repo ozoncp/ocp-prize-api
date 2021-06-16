@@ -33,7 +33,7 @@ func (a *API) CreatePrizeV1(
 		Link:    req.Link,
 		IssueID: req.IssueId,
 	}
-	id, err := a.currentRepo.AddPrize(ctx, prizeToAdd)
+	id, err := a.currentRepo.AddPrizes(ctx, []prize.Prize{prizeToAdd})
 	if err != nil {
 		log.Printf("CreatePrizeV1 error: %s", err.Error())
 		return nil, err

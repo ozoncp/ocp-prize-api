@@ -18,8 +18,7 @@ const (
 
 // IRepo for prize
 type IRepo interface {
-	AddPrize(ctx context.Context, prize prize.Prize) (uint64, error)
-	AddPrizes(ctx context.Context, prizes []prize.Prize) error
+	AddPrizes(ctx context.Context, prizes []prize.Prize) (uint64, error)
 	RemovePrize(ctx context.Context, prizeID uint64) (bool, error)
 	DescribePrize(ctx context.Context, prizeID uint64) (*prize.Prize, error)
 	ListPrizes(ctx context.Context, limit, offset uint64) ([]prize.Prize, error)
@@ -33,23 +32,7 @@ func NewRepo(db *sqlx.DB) IRepo {
 	return &repo{db: db}
 }
 
-func (r *repo) AddPrize(ctx context.Context, prize prize.Prize) (uint64, error) {
-	log.Printf("Add Prizes to database")
-	query := sq.Insert(tableName).
-		Columns("link", "issueID").
-		Values(prize.Link, prize.IssueID).
-		RunWith(r.db).
-		PlaceholderFormat(sq.Dollar)
-
-	err := query.QueryRowContext(ctx).Scan(&prize.ID)
-	if err != nil {
-		log.Printf(err.Error())
-		return 0, err
-	}
-	return prize.ID, nil
-}
-
-func (r *repo) AddPrizes(ctx context.Context, prizes []prize.Prize) error {
+func (r *repo) AddPrizes(ctx context.Context, prizes []prize.Prize) (uint64, error) {
 	log.Printf("Add Prizes to database")
 	query := sq.Insert(tableName).
 		Columns("link", "issueID").
@@ -61,11 +44,17 @@ func (r *repo) AddPrizes(ctx context.Context, prizes []prize.Prize) error {
 		query = query.Values(prize.Link, prize.IssueID)
 	}
 
-	_, err := query.ExecContext(ctx)
+	result, err := query.ExecContext(ctx)
 	if err != nil {
 		log.Printf(err.Error())
+		return 0, err
 	}
-	return err
+	id, err := result.LastInsertId()
+	if err != nil {
+		log.Printf(err.Error())
+		return 0, err
+	}
+	return uint64(id), err
 }
 
 func (r *repo) RemovePrize(ctx context.Context, prizeID uint64) (bool, error) {
