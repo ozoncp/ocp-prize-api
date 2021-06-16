@@ -50,7 +50,7 @@ message ListPrizeV1Response {
 }
 
 message CreatePrizeV1Request {
-    string link = 3;
+    string link = 1;
     uint64 issue_id = 2;
 }
 
