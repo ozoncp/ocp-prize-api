@@ -152,4 +152,35 @@ var _ = Describe("Saver", func() {
 		})
 	})
 
+	Context("Concurrent test", func() {
+
+		BeforeEach(func() {
+			prizesToAdd = []prize.Prize{prize.NewPrize(1, 2, "www"),
+				prize.NewPrize(2, 2, "www"), prize.NewPrize(3, 2, "www"),
+				prize.NewPrize(4, 2, "www"), prize.NewPrize(5, 2, "www")}
+
+			mockFlusher.EXPECT().Flush(gomock.Any()).Return(nil, nil).MinTimes(1)
+		})
+
+		It("Test with few gorutines working with saver", func() {
+			testSaver = saver.NewSaver(3, mockFlusher, 100*time.Millisecond)
+			err := testSaver.Init()
+			Expect(err).Should(BeNil())
+			for i := 0; i < 100; i++ {
+				go func() {
+					for _, currentPrize := range prizesToAdd {
+						errSave := testSaver.Save(currentPrize)
+						Expect(errSave).Should(BeNil())
+					}
+				}()
+
+			}
+			time.Sleep(400 * time.Millisecond)
+			testSaver.Close()
+			state := testSaver.GetState()
+			Expect(state.ResultCode).Should(BeEquivalentTo(saver.OKSaverResultCode))
+			Expect(state.ErrorOfSaving).Should(BeNil())
+		})
+	})
+
 })
