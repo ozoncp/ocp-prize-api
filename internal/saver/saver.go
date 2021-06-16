@@ -1,6 +1,7 @@
 package saver
 
 import (
+	"context"
 	"errors"
 	"sync"
 	"time"
@@ -46,6 +47,7 @@ type Saver struct {
 	bufferMutex     sync.Mutex
 	buffer          []prize.Prize
 	shiftOverriting int
+	ctx             context.Context
 }
 
 // NewSaver return Saver struct with setted capacity, flusher and timeout
@@ -98,7 +100,7 @@ func (originSaver *Saver) savingLoop() {
 				continue
 			}
 			originSaver.bufferMutex.Lock()
-			leftPrizes, err := originSaver.flusher.Flush(originSaver.buffer)
+			leftPrizes, err := originSaver.flusher.Flush(originSaver.ctx, originSaver.buffer)
 			if leftPrizes != nil {
 				originSaver.buffer = make([]prize.Prize, 0, originSaver.capacity)
 				originSaver.buffer = append(originSaver.buffer, leftPrizes...)

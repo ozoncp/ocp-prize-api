@@ -15,6 +15,7 @@ RUN go get github.com/golangci/golangci-lint/cmd/golangci-lint
 
 RUN make deps
 
+RUN go get github.com/envoyproxy/protoc-gen-validate
 RUN go install github.com/envoyproxy/protoc-gen-validate
 
 RUN make lint

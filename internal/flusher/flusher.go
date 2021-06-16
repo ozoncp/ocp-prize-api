@@ -1,6 +1,7 @@
 package flusher
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -10,7 +11,7 @@ import (
 
 // IFlusher for prize
 type IFlusher interface {
-	Flush(prize []prize.Prize) ([]prize.Prize, error)
+	Flush(ctx context.Context, prize []prize.Prize) ([]prize.Prize, error)
 }
 
 // Flusher struct
@@ -28,7 +29,7 @@ func NewFlusher(originRepo repo.IRepo, chSize int) IFlusher {
 }
 
 // Flush prizes in repo
-func (originFlusher *Flusher) Flush(prizes []prize.Prize) ([]prize.Prize, error) {
+func (originFlusher *Flusher) Flush(ctx context.Context, prizes []prize.Prize) ([]prize.Prize, error) {
 	chunkSizeToSplit := originFlusher.chunkSize
 	if chunkSizeToSplit > len(prizes) {
 		chunkSizeToSplit = len(prizes)
@@ -38,7 +39,7 @@ func (originFlusher *Flusher) Flush(prizes []prize.Prize) ([]prize.Prize, error)
 		return prizes, errors.New(err.Error())
 	}
 	for i, batchToAdd := range butchedPrizes {
-		err := originFlusher.repo.AddPrizes(batchToAdd)
+		err := originFlusher.repo.AddPrizes(ctx, batchToAdd)
 		if err != nil {
 			return prizes[i*chunkSizeToSplit:], errors.New("error writing prizes from:" + fmt.Sprint(i*chunkSizeToSplit))
 		}
