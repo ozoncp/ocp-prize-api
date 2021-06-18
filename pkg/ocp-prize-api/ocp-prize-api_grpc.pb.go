@@ -18,13 +18,17 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OcpPrizeApiClient interface {
-	// Возвращает список задач
+	// Return list of prize
 	ListPrizeV1(ctx context.Context, in *ListPrizeV1Request, opts ...grpc.CallOption) (*ListPrizeV1Response, error)
-	// Возвращает описание задачи по ее идентификатору
+	// Return description of prize by id
 	DescribePrizeV1(ctx context.Context, in *DescribePrizeV1Request, opts ...grpc.CallOption) (*DescribePrizeV1Response, error)
-	// Создает новую задачу
+	// Сreate new prize
 	CreatePrizeV1(ctx context.Context, in *CreatePrizeV1Request, opts ...grpc.CallOption) (*CreatePrizeV1Response, error)
-	// Удаляет задачу по идентификатору
+	// Сreate few new prizes
+	MultiCreatePrizeV1(ctx context.Context, in *MultiCreatePrizeV1Request, opts ...grpc.CallOption) (*MultiCreatePrizeV1Response, error)
+	// Update prize
+	UpdatePrizeV1(ctx context.Context, in *UpdatePrizeV1Request, opts ...grpc.CallOption) (*UpdatePrizeV1Response, error)
+	// Delete prize by id
 	RemovePrizeV1(ctx context.Context, in *RemovePrizeV1Request, opts ...grpc.CallOption) (*RemovePrizeV1Response, error)
 }
 
@@ -63,6 +67,24 @@ func (c *ocpPrizeApiClient) CreatePrizeV1(ctx context.Context, in *CreatePrizeV1
 	return out, nil
 }
 
+func (c *ocpPrizeApiClient) MultiCreatePrizeV1(ctx context.Context, in *MultiCreatePrizeV1Request, opts ...grpc.CallOption) (*MultiCreatePrizeV1Response, error) {
+	out := new(MultiCreatePrizeV1Response)
+	err := c.cc.Invoke(ctx, "/ocp.prize.api.OcpPrizeApi/MultiCreatePrizeV1", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *ocpPrizeApiClient) UpdatePrizeV1(ctx context.Context, in *UpdatePrizeV1Request, opts ...grpc.CallOption) (*UpdatePrizeV1Response, error) {
+	out := new(UpdatePrizeV1Response)
+	err := c.cc.Invoke(ctx, "/ocp.prize.api.OcpPrizeApi/UpdatePrizeV1", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *ocpPrizeApiClient) RemovePrizeV1(ctx context.Context, in *RemovePrizeV1Request, opts ...grpc.CallOption) (*RemovePrizeV1Response, error) {
 	out := new(RemovePrizeV1Response)
 	err := c.cc.Invoke(ctx, "/ocp.prize.api.OcpPrizeApi/RemovePrizeV1", in, out, opts...)
@@ -76,13 +98,17 @@ func (c *ocpPrizeApiClient) RemovePrizeV1(ctx context.Context, in *RemovePrizeV1
 // All implementations must embed UnimplementedOcpPrizeApiServer
 // for forward compatibility
 type OcpPrizeApiServer interface {
-	// Возвращает список задач
+	// Return list of prize
 	ListPrizeV1(context.Context, *ListPrizeV1Request) (*ListPrizeV1Response, error)
-	// Возвращает описание задачи по ее идентификатору
+	// Return description of prize by id
 	DescribePrizeV1(context.Context, *DescribePrizeV1Request) (*DescribePrizeV1Response, error)
-	// Создает новую задачу
+	// Сreate new prize
 	CreatePrizeV1(context.Context, *CreatePrizeV1Request) (*CreatePrizeV1Response, error)
-	// Удаляет задачу по идентификатору
+	// Сreate few new prizes
+	MultiCreatePrizeV1(context.Context, *MultiCreatePrizeV1Request) (*MultiCreatePrizeV1Response, error)
+	// Update prize
+	UpdatePrizeV1(context.Context, *UpdatePrizeV1Request) (*UpdatePrizeV1Response, error)
+	// Delete prize by id
 	RemovePrizeV1(context.Context, *RemovePrizeV1Request) (*RemovePrizeV1Response, error)
 	mustEmbedUnimplementedOcpPrizeApiServer()
 }
@@ -99,6 +125,12 @@ func (UnimplementedOcpPrizeApiServer) DescribePrizeV1(context.Context, *Describe
 }
 func (UnimplementedOcpPrizeApiServer) CreatePrizeV1(context.Context, *CreatePrizeV1Request) (*CreatePrizeV1Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePrizeV1 not implemented")
+}
+func (UnimplementedOcpPrizeApiServer) MultiCreatePrizeV1(context.Context, *MultiCreatePrizeV1Request) (*MultiCreatePrizeV1Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MultiCreatePrizeV1 not implemented")
+}
+func (UnimplementedOcpPrizeApiServer) UpdatePrizeV1(context.Context, *UpdatePrizeV1Request) (*UpdatePrizeV1Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePrizeV1 not implemented")
 }
 func (UnimplementedOcpPrizeApiServer) RemovePrizeV1(context.Context, *RemovePrizeV1Request) (*RemovePrizeV1Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemovePrizeV1 not implemented")
@@ -170,6 +202,42 @@ func _OcpPrizeApi_CreatePrizeV1_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OcpPrizeApi_MultiCreatePrizeV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MultiCreatePrizeV1Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OcpPrizeApiServer).MultiCreatePrizeV1(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ocp.prize.api.OcpPrizeApi/MultiCreatePrizeV1",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OcpPrizeApiServer).MultiCreatePrizeV1(ctx, req.(*MultiCreatePrizeV1Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OcpPrizeApi_UpdatePrizeV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePrizeV1Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OcpPrizeApiServer).UpdatePrizeV1(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ocp.prize.api.OcpPrizeApi/UpdatePrizeV1",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OcpPrizeApiServer).UpdatePrizeV1(ctx, req.(*UpdatePrizeV1Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _OcpPrizeApi_RemovePrizeV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RemovePrizeV1Request)
 	if err := dec(in); err != nil {
@@ -206,6 +274,14 @@ var OcpPrizeApi_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreatePrizeV1",
 			Handler:    _OcpPrizeApi_CreatePrizeV1_Handler,
+		},
+		{
+			MethodName: "MultiCreatePrizeV1",
+			Handler:    _OcpPrizeApi_MultiCreatePrizeV1_Handler,
+		},
+		{
+			MethodName: "UpdatePrizeV1",
+			Handler:    _OcpPrizeApi_UpdatePrizeV1_Handler,
 		},
 		{
 			MethodName: "RemovePrizeV1",

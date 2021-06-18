@@ -326,6 +326,297 @@ var _ interface {
 	ErrorName() string
 } = CreatePrizeV1ResponseValidationError{}
 
+// Validate checks the field values on MultiCreatePrizeV1Request with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MultiCreatePrizeV1Request) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetPrizes() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MultiCreatePrizeV1RequestValidationError{
+					field:  fmt.Sprintf("Prizes[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// MultiCreatePrizeV1RequestValidationError is the validation error returned by
+// MultiCreatePrizeV1Request.Validate if the designated constraints aren't met.
+type MultiCreatePrizeV1RequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MultiCreatePrizeV1RequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MultiCreatePrizeV1RequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MultiCreatePrizeV1RequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MultiCreatePrizeV1RequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MultiCreatePrizeV1RequestValidationError) ErrorName() string {
+	return "MultiCreatePrizeV1RequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MultiCreatePrizeV1RequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMultiCreatePrizeV1Request.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MultiCreatePrizeV1RequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MultiCreatePrizeV1RequestValidationError{}
+
+// Validate checks the field values on MultiCreatePrizeV1Response with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MultiCreatePrizeV1Response) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// MultiCreatePrizeV1ResponseValidationError is the validation error returned
+// by MultiCreatePrizeV1Response.Validate if the designated constraints aren't met.
+type MultiCreatePrizeV1ResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MultiCreatePrizeV1ResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MultiCreatePrizeV1ResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MultiCreatePrizeV1ResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MultiCreatePrizeV1ResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MultiCreatePrizeV1ResponseValidationError) ErrorName() string {
+	return "MultiCreatePrizeV1ResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MultiCreatePrizeV1ResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMultiCreatePrizeV1Response.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MultiCreatePrizeV1ResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MultiCreatePrizeV1ResponseValidationError{}
+
+// Validate checks the field values on UpdatePrizeV1Request with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpdatePrizeV1Request) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Id
+
+	// no validation rules for Link
+
+	// no validation rules for IssueId
+
+	return nil
+}
+
+// UpdatePrizeV1RequestValidationError is the validation error returned by
+// UpdatePrizeV1Request.Validate if the designated constraints aren't met.
+type UpdatePrizeV1RequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdatePrizeV1RequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdatePrizeV1RequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdatePrizeV1RequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdatePrizeV1RequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdatePrizeV1RequestValidationError) ErrorName() string {
+	return "UpdatePrizeV1RequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdatePrizeV1RequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdatePrizeV1Request.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdatePrizeV1RequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdatePrizeV1RequestValidationError{}
+
+// Validate checks the field values on UpdatePrizeV1Response with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpdatePrizeV1Response) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Succeed
+
+	return nil
+}
+
+// UpdatePrizeV1ResponseValidationError is the validation error returned by
+// UpdatePrizeV1Response.Validate if the designated constraints aren't met.
+type UpdatePrizeV1ResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdatePrizeV1ResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdatePrizeV1ResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdatePrizeV1ResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdatePrizeV1ResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdatePrizeV1ResponseValidationError) ErrorName() string {
+	return "UpdatePrizeV1ResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdatePrizeV1ResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdatePrizeV1Response.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdatePrizeV1ResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdatePrizeV1ResponseValidationError{}
+
 // Validate checks the field values on RemovePrizeV1Request with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

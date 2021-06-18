@@ -100,7 +100,7 @@ func (originSaver *Saver) savingLoop() {
 				continue
 			}
 			originSaver.bufferMutex.Lock()
-			leftPrizes, err := originSaver.flusher.Flush(originSaver.ctx, originSaver.buffer)
+			leftPrizes, _, err := originSaver.flusher.Flush(originSaver.ctx, originSaver.buffer, nil)
 			if leftPrizes != nil {
 				originSaver.buffer = make([]prize.Prize, 0, originSaver.capacity)
 				originSaver.buffer = append(originSaver.buffer, leftPrizes...)

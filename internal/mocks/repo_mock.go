@@ -35,10 +35,10 @@ func (m *MockIRepo) EXPECT() *MockIRepoMockRecorder {
 }
 
 // AddPrizes mocks base method
-func (m *MockIRepo) AddPrizes(arg0 context.Context, arg1 []prize.Prize) (uint64, error) {
+func (m *MockIRepo) AddPrizes(arg0 context.Context, arg1 []prize.Prize) ([]uint64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddPrizes", arg0, arg1)
-	ret0, _ := ret[0].(uint64)
+	ret0, _ := ret[0].([]uint64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -92,4 +92,18 @@ func (m *MockIRepo) RemovePrize(arg0 context.Context, arg1 uint64) (bool, error)
 func (mr *MockIRepoMockRecorder) RemovePrize(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemovePrize", reflect.TypeOf((*MockIRepo)(nil).RemovePrize), arg0, arg1)
+}
+
+// UpdatePrize mocks base method
+func (m *MockIRepo) UpdatePrize(arg0 context.Context, arg1 prize.Prize) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdatePrize", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdatePrize indicates an expected call of UpdatePrize
+func (mr *MockIRepoMockRecorder) UpdatePrize(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePrize", reflect.TypeOf((*MockIRepo)(nil).UpdatePrize), arg0, arg1)
 }

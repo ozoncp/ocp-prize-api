@@ -4,7 +4,11 @@ import (
 	"context"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/opentracing/opentracing-go"
+	"github.com/ozoncp/ocp-prize-api/internal/flusher"
+	"github.com/ozoncp/ocp-prize-api/internal/metrics"
 	"github.com/ozoncp/ocp-prize-api/internal/prize"
+	"github.com/ozoncp/ocp-prize-api/internal/producer"
 	"github.com/ozoncp/ocp-prize-api/internal/repo"
 	desc "github.com/ozoncp/ocp-prize-api/pkg/ocp-prize-api"
 	"github.com/rs/zerolog/log"
@@ -12,14 +16,18 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const flusherMaximumChankSize = 100
+
 type API struct {
 	desc.UnimplementedOcpPrizeApiServer
 	currentRepo repo.IRepo
+	producer    producer.IProducer
 }
 
-func NewOcpPrizeApi(db *sqlx.DB) desc.OcpPrizeApiServer {
+func NewOcpPrizeApi(db *sqlx.DB, producer producer.IProducer) desc.OcpPrizeApiServer {
 	return &API{
 		currentRepo: repo.NewRepo(db),
+		producer:    producer,
 	}
 }
 
@@ -38,8 +46,72 @@ func (a *API) CreatePrizeV1(
 		log.Printf("CreatePrizeV1 error: %s", err.Error())
 		return nil, err
 	}
+
+	a.producer.SendMessage("CreatePrizeV1 succesful")
+
+	metrics.IncrementSuccessfulCreate(1)
+
 	response := desc.CreatePrizeV1Response{
-		PrizeId: id,
+		PrizeId: id[0],
+	}
+	return &response, nil
+}
+
+func (a *API) MultiCreatePrizeV1(
+	ctx context.Context,
+	req *desc.MultiCreatePrizeV1Request,
+) (*desc.MultiCreatePrizeV1Response, error) {
+	log.Printf("MultiCreatePrizeV1 request: %s", req.String())
+	span := opentracing.GlobalTracer().StartSpan("MultiCreatePrizeV1")
+	defer span.Finish()
+
+	prizesToAdd := make([]prize.Prize, 0, len(req.Prizes))
+
+	for _, prizeToAdd := range req.Prizes {
+		prizesToAdd = append(prizesToAdd, prize.NewPrize(prizeToAdd.Id, prizeToAdd.IssueId, prizeToAdd.Link))
+	}
+
+	flusher := flusher.NewFlusher(a.currentRepo, flusherMaximumChankSize)
+	_, ids, err := flusher.Flush(ctx, prizesToAdd, span)
+
+	if err != nil {
+		log.Printf("MultiCreatePrizeV1 error: %s", err.Error())
+		return nil, err
+	}
+
+	a.producer.SendMessage("MultiCreatePrizeV1 succesful")
+
+	metrics.IncrementSuccessfulCreate(1)
+
+	response := desc.MultiCreatePrizeV1Response{
+		PrizeIds: ids,
+	}
+	return &response, nil
+}
+
+func (a *API) UpdatePrizeV1(
+	ctx context.Context,
+	req *desc.UpdatePrizeV1Request,
+) (*desc.UpdatePrizeV1Response, error) {
+
+	log.Printf("UpdatePrizeV1 request: %s", req.String())
+	prizeToUpdate := prize.Prize{
+		ID:      req.Id,
+		Link:    req.Link,
+		IssueID: req.IssueId,
+	}
+	err := a.currentRepo.UpdatePrize(ctx, prizeToUpdate)
+	if err != nil {
+		log.Printf("UpdatePrizeV1 error: %s", err.Error())
+		return nil, err
+	}
+
+	a.producer.SendMessage("UpdatePrizeV1 succesful")
+
+	metrics.IncrementSuccessfulUpdate(1)
+
+	response := desc.UpdatePrizeV1Response{
+		Succeed: true,
 	}
 	return &response, nil
 }
@@ -58,6 +130,11 @@ func (a *API) DescribePrizeV1(
 		log.Printf("DescribePrizeV1 error: %s", err.Error())
 		return nil, err
 	}
+
+	a.producer.SendMessage("DescribePrizeV1 succesful")
+
+	metrics.IncrementSuccessfulDescribe(1)
+
 	response := desc.DescribePrizeV1Response{
 		Prize: &desc.Prize{
 			Id:      prize.ID,
@@ -78,6 +155,11 @@ func (a *API) ListPrizeV1(
 		log.Printf("ListPrizeV1 error: %s", err.Error())
 		return nil, err
 	}
+
+	a.producer.SendMessage("ListPrizeV1 succesful")
+
+	metrics.IncrementSuccessfulList(1)
+
 	var response desc.ListPrizeV1Response
 	for _, prize := range prizes {
 		response.Prizes = append(response.Prizes, &desc.Prize{
@@ -99,10 +181,16 @@ func (a *API) RemovePrizeV1(
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	found, err := a.currentRepo.RemovePrize(ctx, req.PrizeId)
+
 	if err != nil {
 		log.Printf("RemovePrizeV1 error: %s", err.Error())
 		return nil, err
 	}
+
+	a.producer.SendMessage("RemovePrizeV1 succesful")
+
+	metrics.IncrementSuccessfulRemove(1)
+
 	response := desc.RemovePrizeV1Response{
 		Found: found,
 	}

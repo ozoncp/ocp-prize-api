@@ -75,4 +75,3 @@ install-go-deps: .install-go-deps
 		go get google.golang.org/grpc/cmd/protoc-gen-go-grpc
 		go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 		go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
-		export PATH="$PATH:$(go env GOPATH)/bin"

@@ -9,6 +9,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	api "github.com/ozoncp/ocp-prize-api/internal/api"
+	"github.com/ozoncp/ocp-prize-api/internal/producer"
 	desc "github.com/ozoncp/ocp-prize-api/pkg/ocp-prize-api"
 )
 
@@ -26,7 +27,8 @@ func run() error {
 	}
 
 	s := grpc.NewServer()
-	desc.RegisterOcpPrizeApiServer(s, api.NewOcpPrizeApi(sqlxDB))
+	prod := producer.NewProducer("OcpPrizeApi")
+	desc.RegisterOcpPrizeApiServer(s, api.NewOcpPrizeApi(sqlxDB, prod))
 
 	if err := s.Serve(listen); err != nil {
 		log.Fatalf("failed to serve: %v", err)

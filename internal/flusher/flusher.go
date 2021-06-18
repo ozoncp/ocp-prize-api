@@ -7,11 +7,13 @@ import (
 
 	"github.com/ozoncp/ocp-prize-api/internal/prize"
 	"github.com/ozoncp/ocp-prize-api/internal/repo"
+
+	opentracing "github.com/opentracing/opentracing-go"
 )
 
 // IFlusher for prize
 type IFlusher interface {
-	Flush(ctx context.Context, prize []prize.Prize) ([]prize.Prize, error)
+	Flush(ctx context.Context, prize []prize.Prize, parentSpan opentracing.Span) ([]prize.Prize, []uint64, error)
 }
 
 // Flusher struct
@@ -29,20 +31,29 @@ func NewFlusher(originRepo repo.IRepo, chSize int) IFlusher {
 }
 
 // Flush prizes in repo
-func (originFlusher *Flusher) Flush(ctx context.Context, prizes []prize.Prize) ([]prize.Prize, error) {
+func (originFlusher *Flusher) Flush(ctx context.Context, prizes []prize.Prize, parentSpan opentracing.Span) ([]prize.Prize, []uint64, error) {
 	chunkSizeToSplit := originFlusher.chunkSize
 	if chunkSizeToSplit > len(prizes) {
 		chunkSizeToSplit = len(prizes)
 	}
-	butchedPrizes, err := prize.SplitPrizeSliceToBunches(prizes, chunkSizeToSplit)
+	ids := make([]uint64, 0)
+	batchedPrizes, err := prize.SplitPrizeSliceToBunches(prizes, chunkSizeToSplit)
 	if err != nil {
-		return prizes, errors.New(err.Error())
+		return prizes, nil, errors.New(err.Error())
 	}
-	for i, batchToAdd := range butchedPrizes {
-		_, err := originFlusher.repo.AddPrizes(ctx, batchToAdd)
+	for i, batchToAdd := range batchedPrizes {
+		var childSpan opentracing.Span
+		if parentSpan != nil {
+			childSpan = opentracing.GlobalTracer().StartSpan("AddPrise", opentracing.ChildOf(parentSpan.Context()))
+		}
+		partOfIds, err := originFlusher.repo.AddPrizes(ctx, batchToAdd)
+		ids = append(ids, partOfIds...)
+		if childSpan != nil {
+			childSpan.Finish()
+		}
 		if err != nil {
-			return prizes[i*chunkSizeToSplit:], errors.New("error writing prizes from:" + fmt.Sprint(i*chunkSizeToSplit))
+			return prizes[i*chunkSizeToSplit:], ids, errors.New("error writing prizes from:" + fmt.Sprint(i*chunkSizeToSplit))
 		}
 	}
-	return nil, nil
+	return nil, ids, nil
 }
