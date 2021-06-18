@@ -33,6 +33,9 @@ func NewFlusher(originRepo repo.IRepo, chSize int) IFlusher {
 // Flush prizes in repo
 func (originFlusher *Flusher) Flush(ctx context.Context, prizes []prize.Prize) ([]prize.Prize, []uint64, error) {
 	parentSpan := opentracing.SpanFromContext(ctx)
+	if parentSpan == nil {
+		parentSpan = opentracing.GlobalTracer().StartSpan("MultiCreatePrizeV1")
+	}
 	chunkSizeToSplit := originFlusher.chunkSize
 	if chunkSizeToSplit > len(prizes) {
 		chunkSizeToSplit = len(prizes)

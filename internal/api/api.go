@@ -62,7 +62,10 @@ func (a *API) MultiCreatePrizeV1(
 	req *desc.MultiCreatePrizeV1Request,
 ) (*desc.MultiCreatePrizeV1Response, error) {
 	log.Printf("MultiCreatePrizeV1 request: %s", req.String())
-	span := opentracing.GlobalTracer().StartSpan("MultiCreatePrizeV1")
+	span := opentracing.SpanFromContext(ctx)
+	if span == nil {
+		span = opentracing.GlobalTracer().StartSpan("MultiCreatePrizeV1")
+	}
 	defer span.Finish()
 
 	prizesToAdd := make([]prize.Prize, 0, len(req.Prizes))
