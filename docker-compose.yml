@@ -1,6 +1,19 @@
 version: "3"
 
 services:
+    pr_db:
+        container_name: pr_db
+        image: postgres
+        restart: always
+        environment:
+          - POSTGRES_PASSWORD=avK25
+          - POSTGRES_USER=postgres
+          - POSTGRES_DB=stage
+        volumes:
+          - .pgdata:/data/postgres
+        ports:
+          - ${POSTGRES_PORT:-5432}:5432
+
     zookeeper:
         image: confluentinc/cp-zookeeper
         ports:

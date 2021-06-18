@@ -44,7 +44,7 @@ var _ = Describe("Flusher", func() {
 
 		It("Test flushing with correct input", func() {
 			testFlusher = flusher.NewFlusher(mockRepo, 3)
-			leftPrizes, _, errorFlush = testFlusher.Flush(ctx, prizesToAdd, nil)
+			leftPrizes, _, errorFlush = testFlusher.Flush(ctx, prizesToAdd)
 			Expect(leftPrizes).Should(BeNil())
 			Expect(errorFlush).Should(BeNil())
 		})
@@ -62,7 +62,7 @@ var _ = Describe("Flusher", func() {
 
 		It("Test flushing with error at first try to add bunch", func() {
 			testFlusher = flusher.NewFlusher(mockRepo, 3)
-			leftPrizes, _, errorFlush = testFlusher.Flush(ctx, prizesToAdd, nil)
+			leftPrizes, _, errorFlush = testFlusher.Flush(ctx, prizesToAdd)
 			Expect(leftPrizes).Should(BeEquivalentTo(prizesToAdd))
 			Expect(errorFlush).ShouldNot(BeNil())
 		})
@@ -82,7 +82,7 @@ var _ = Describe("Flusher", func() {
 
 		It("Test flushing with error at second try to add bunch", func() {
 			testFlusher = flusher.NewFlusher(mockRepo, 3)
-			leftPrizes, _, errorFlush = testFlusher.Flush(ctx, prizesToAdd, nil)
+			leftPrizes, _, errorFlush = testFlusher.Flush(ctx, prizesToAdd)
 			Expect(len(leftPrizes)).Should(BeEquivalentTo(2))
 			Expect(errorFlush).ShouldNot(BeNil())
 		})

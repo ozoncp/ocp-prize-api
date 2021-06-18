@@ -72,7 +72,7 @@ func (a *API) MultiCreatePrizeV1(
 	}
 
 	flusher := flusher.NewFlusher(a.currentRepo, flusherMaximumChankSize)
-	_, ids, err := flusher.Flush(ctx, prizesToAdd, span)
+	_, ids, err := flusher.Flush(opentracing.ContextWithSpan(ctx, span), prizesToAdd)
 
 	if err != nil {
 		log.Printf("MultiCreatePrizeV1 error: %s", err.Error())

@@ -34,7 +34,7 @@ var _ = Describe("Saver", func() {
 				prize.NewPrize(2, 2, "www"), prize.NewPrize(3, 2, "www"),
 				prize.NewPrize(4, 2, "www"), prize.NewPrize(5, 2, "www")}
 
-			mockFlusher.EXPECT().Flush(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, []uint64{1, 2, 3, 4, 5}, nil).MinTimes(1)
+			mockFlusher.EXPECT().Flush(gomock.Any(), gomock.Any()).Return(nil, []uint64{1, 2, 3, 4, 5}, nil).MinTimes(1)
 		})
 
 		It("Test with correct saving", func() {
@@ -100,7 +100,7 @@ var _ = Describe("Saver", func() {
 				prize.NewPrize(2, 2, "www"), prize.NewPrize(3, 2, "www"),
 				prize.NewPrize(4, 2, "www"), prize.NewPrize(5, 2, "www")}
 
-			mockFlusher.EXPECT().Flush(gomock.Any(), gomock.Any(), gomock.Any()).Return(prizesToAdd, nil, errors.New("error flushing")).MinTimes(1)
+			mockFlusher.EXPECT().Flush(gomock.Any(), gomock.Any()).Return(prizesToAdd, nil, errors.New("error flushing")).MinTimes(1)
 		})
 
 		It("Test error saving", func() {
@@ -126,7 +126,7 @@ var _ = Describe("Saver", func() {
 				prize.NewPrize(2, 2, "www"), prize.NewPrize(3, 2, "www"),
 				prize.NewPrize(4, 2, "www"), prize.NewPrize(5, 2, "www")}
 
-			mockFlusher.EXPECT().Flush(gomock.Any(), gomock.Any(), gomock.Any()).Return(prizesToAdd, nil, errors.New("error flushing")).MinTimes(1)
+			mockFlusher.EXPECT().Flush(gomock.Any(), gomock.Any()).Return(prizesToAdd, nil, errors.New("error flushing")).MinTimes(1)
 		})
 
 		It("Test with triple init", func() {
@@ -159,7 +159,7 @@ var _ = Describe("Saver", func() {
 				prize.NewPrize(2, 2, "www"), prize.NewPrize(3, 2, "www"),
 				prize.NewPrize(4, 2, "www"), prize.NewPrize(5, 2, "www")}
 
-			mockFlusher.EXPECT().Flush(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, nil, nil).MinTimes(1)
+			mockFlusher.EXPECT().Flush(gomock.Any(), gomock.Any()).Return(nil, nil, nil).MinTimes(1)
 		})
 
 		It("Test with few gorutines working with saver", func() {

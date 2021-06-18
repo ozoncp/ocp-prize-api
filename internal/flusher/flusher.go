@@ -13,7 +13,7 @@ import (
 
 // IFlusher for prize
 type IFlusher interface {
-	Flush(ctx context.Context, prize []prize.Prize, parentSpan opentracing.Span) ([]prize.Prize, []uint64, error)
+	Flush(ctx context.Context, prize []prize.Prize) ([]prize.Prize, []uint64, error)
 }
 
 // Flusher struct
@@ -31,7 +31,8 @@ func NewFlusher(originRepo repo.IRepo, chSize int) IFlusher {
 }
 
 // Flush prizes in repo
-func (originFlusher *Flusher) Flush(ctx context.Context, prizes []prize.Prize, parentSpan opentracing.Span) ([]prize.Prize, []uint64, error) {
+func (originFlusher *Flusher) Flush(ctx context.Context, prizes []prize.Prize) ([]prize.Prize, []uint64, error) {
+	parentSpan := opentracing.SpanFromContext(ctx)
 	chunkSizeToSplit := originFlusher.chunkSize
 	if chunkSizeToSplit > len(prizes) {
 		chunkSizeToSplit = len(prizes)

@@ -7,7 +7,6 @@ package mocks
 import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
-	opentracing_go "github.com/opentracing/opentracing-go"
 	prize "github.com/ozoncp/ocp-prize-api/internal/prize"
 	reflect "reflect"
 )
@@ -36,9 +35,9 @@ func (m *MockIFlusher) EXPECT() *MockIFlusherMockRecorder {
 }
 
 // Flush mocks base method
-func (m *MockIFlusher) Flush(arg0 context.Context, arg1 []prize.Prize, arg2 opentracing_go.Span) ([]prize.Prize, []uint64, error) {
+func (m *MockIFlusher) Flush(arg0 context.Context, arg1 []prize.Prize) ([]prize.Prize, []uint64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Flush", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Flush", arg0, arg1)
 	ret0, _ := ret[0].([]prize.Prize)
 	ret1, _ := ret[1].([]uint64)
 	ret2, _ := ret[2].(error)
@@ -46,7 +45,7 @@ func (m *MockIFlusher) Flush(arg0 context.Context, arg1 []prize.Prize, arg2 open
 }
 
 // Flush indicates an expected call of Flush
-func (mr *MockIFlusherMockRecorder) Flush(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockIFlusherMockRecorder) Flush(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Flush", reflect.TypeOf((*MockIFlusher)(nil).Flush), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Flush", reflect.TypeOf((*MockIFlusher)(nil).Flush), arg0, arg1)
 }

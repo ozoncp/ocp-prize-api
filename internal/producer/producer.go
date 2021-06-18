@@ -10,6 +10,7 @@ var brokers = []string{"127.0.0.1:9094"}
 
 type IProducer interface {
 	SendMessage(msg string) bool
+	Close() error
 }
 
 type Producer struct {
@@ -22,6 +23,7 @@ func NewProducer(topic string) IProducer {
 	config.Producer.Partitioner = sarama.NewRandomPartitioner
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Return.Successes = true
+	config.ClientID = "123"
 	producer, err := sarama.NewSyncProducer(brokers, config)
 	if err != nil {
 		return nil
@@ -40,6 +42,10 @@ func (prod *Producer) SendMessage(msg string) bool {
 		return false
 	}
 	return true
+}
+
+func (prod *Producer) Close() error {
+	return prod.SyncProducer.Close()
 }
 
 func prepareMessage(topic, message string) *sarama.ProducerMessage {

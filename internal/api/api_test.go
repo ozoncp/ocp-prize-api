@@ -26,6 +26,7 @@ var _ = Describe("Api", func() {
 		db      *sql.DB
 		sqlxDB  *sqlx.DB
 		err     error
+		prod    producer.IProducer
 	)
 	BeforeEach(func() {
 		ctx = context.Background()
@@ -52,10 +53,11 @@ var _ = Describe("Api", func() {
 				AddRow(1)
 			mock.ExpectQuery("INSERT INTO prizes").
 				WithArgs(request.Link, request.IssueId).WillReturnRows(rows)
-			prod := producer.NewProducer("TestOcpPrizeApi")
+
+			prod = producer.NewProducer("TestOcpPrizeApiCreate")
+
 			testApi = api.NewOcpPrizeApi(sqlxDB, prod)
 			Expect(testApi).ShouldNot(BeNil())
-
 			response, err := testApi.CreatePrizeV1(ctx, request)
 			Expect(err).Should(BeNil())
 			Expect(response.PrizeId).Should(BeEquivalentTo(1))
@@ -68,7 +70,6 @@ var _ = Describe("Api", func() {
 			}
 			mock.ExpectQuery("INSERT INTO prizes").
 				WithArgs(request.Link, request.IssueId).WillReturnError(errors.New("can't insert prize"))
-			prod := producer.NewProducer("TestOcpPrizeApi")
 			testApi = api.NewOcpPrizeApi(sqlxDB, prod)
 			Expect(testApi).ShouldNot(BeNil())
 
@@ -88,6 +89,7 @@ var _ = Describe("Api", func() {
 					Link:    prize.Link,
 				})
 			}
+
 			request := &desc.MultiCreatePrizeV1Request{
 				Prizes: descPrizes,
 			}
@@ -99,7 +101,9 @@ var _ = Describe("Api", func() {
 					prizesToAdd[2].Link, prizesToAdd[2].IssueID,
 					prizesToAdd[3].Link, prizesToAdd[3].IssueID,
 					prizesToAdd[4].Link, prizesToAdd[4].IssueID).WillReturnRows(rows)
-			prod := producer.NewProducer("TestOcpPrizeApi")
+
+			prod = producer.NewProducer("TestOcpPrizeApiMultiCreate")
+
 			testApi = api.NewOcpPrizeApi(sqlxDB, prod)
 			Expect(testApi).ShouldNot(BeNil())
 
@@ -130,7 +134,6 @@ var _ = Describe("Api", func() {
 					prizesToAdd[3].Link, prizesToAdd[3].IssueID,
 					prizesToAdd[4].Link, prizesToAdd[4].IssueID).
 				WillReturnError(errors.New("can't multi add prizes"))
-			prod := producer.NewProducer("TestOcpPrizeApi")
 			testApi = api.NewOcpPrizeApi(sqlxDB, prod)
 			Expect(testApi).ShouldNot(BeNil())
 
@@ -146,7 +149,9 @@ var _ = Describe("Api", func() {
 			}
 			mock.ExpectExec("UPDATE prizes SET").
 				WithArgs(request.Link, request.IssueId, request.Id).WillReturnResult(sqlmock.NewResult(1, 1))
-			prod := producer.NewProducer("TestOcpPrizeApi")
+
+			prod = producer.NewProducer("TestOcpPrizeApiUpdate")
+
 			testApi = api.NewOcpPrizeApi(sqlxDB, prod)
 			Expect(testApi).ShouldNot(BeNil())
 
@@ -164,7 +169,6 @@ var _ = Describe("Api", func() {
 			mock.ExpectExec("UPDATE prizes SET").
 				WithArgs(request.Link, request.IssueId, request.Id).
 				WillReturnError(errors.New("can't update prize"))
-			prod := producer.NewProducer("TestOcpPrizeApi")
 			testApi = api.NewOcpPrizeApi(sqlxDB, prod)
 			Expect(testApi).ShouldNot(BeNil())
 
@@ -180,7 +184,9 @@ var _ = Describe("Api", func() {
 				AddRow(true)
 			mock.ExpectQuery("DELETE FROM prizes").
 				WithArgs(request.PrizeId).WillReturnRows(rows)
-			prod := producer.NewProducer("TestOcpPrizeApi")
+
+			prod = producer.NewProducer("TestOcpPrizeApiRemove")
+
 			testApi = api.NewOcpPrizeApi(sqlxDB, prod)
 			Expect(testApi).ShouldNot(BeNil())
 
@@ -195,7 +201,6 @@ var _ = Describe("Api", func() {
 			}
 			mock.ExpectQuery("DELETE FROM prizes").
 				WithArgs(request.PrizeId).WillReturnError(errors.New("can't remove prize"))
-			prod := producer.NewProducer("TestOcpPrizeApi")
 			testApi = api.NewOcpPrizeApi(sqlxDB, prod)
 			Expect(testApi).ShouldNot(BeNil())
 
@@ -212,7 +217,9 @@ var _ = Describe("Api", func() {
 			mock.ExpectQuery("SELECT (.+) FROM prizes WHERE").
 				WithArgs(request.PrizeId).
 				WillReturnRows(rows)
-			prod := producer.NewProducer("TestOcpPrizeApi")
+
+			prod = producer.NewProducer("TestOcpPrizeApiDescribe")
+
 			testApi = api.NewOcpPrizeApi(sqlxDB, prod)
 			Expect(testApi).ShouldNot(BeNil())
 
@@ -223,14 +230,13 @@ var _ = Describe("Api", func() {
 			Expect(response.Prize.Link).Should(BeEquivalentTo("www"))
 		})
 
-		It("Test describe prize", func() {
+		It("Test incorrect describe prize", func() {
 			request := &desc.DescribePrizeV1Request{
 				PrizeId: 1,
 			}
 			mock.ExpectQuery("SELECT (.+) FROM prizes WHERE").
 				WithArgs(request.PrizeId).
 				WillReturnError(errors.New("can't remove prize"))
-			prod := producer.NewProducer("TestOcpPrizeApi")
 			testApi = api.NewOcpPrizeApi(sqlxDB, prod)
 			Expect(testApi).ShouldNot(BeNil())
 
@@ -247,7 +253,9 @@ var _ = Describe("Api", func() {
 				AddRow(1, "www", 2).AddRow(2, "www", 3)
 			mock.ExpectQuery("SELECT id, link, IssueID FROM prizes LIMIT 3 OFFSET 0").
 				WillReturnRows(rows)
-			prod := producer.NewProducer("TestOcpPrizeApi")
+
+			prod = producer.NewProducer("TestOcpPrizeApiList")
+
 			testApi = api.NewOcpPrizeApi(sqlxDB, prod)
 			Expect(testApi).ShouldNot(BeNil())
 
@@ -268,7 +276,6 @@ var _ = Describe("Api", func() {
 			}
 			mock.ExpectQuery("SELECT id, link, IssueID FROM prizes LIMIT 3 OFFSET 0").
 				WillReturnError(errors.New("can't list prize"))
-			prod := producer.NewProducer("TestOcpPrizeApi")
 			testApi = api.NewOcpPrizeApi(sqlxDB, prod)
 			Expect(testApi).ShouldNot(BeNil())
 
