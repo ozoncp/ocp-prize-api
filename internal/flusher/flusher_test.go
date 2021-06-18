@@ -39,12 +39,12 @@ var _ = Describe("Flusher", func() {
 				prize.NewPrize(2, 2, "www"), prize.NewPrize(3, 2, "www"),
 				prize.NewPrize(4, 2, "www"), prize.NewPrize(5, 2, "www")}
 
-			mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return(uint64(1), nil).MinTimes(1)
+			mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return([]uint64{1}, nil).MinTimes(1)
 		})
 
 		It("Test flushing with correct input", func() {
 			testFlusher = flusher.NewFlusher(mockRepo, 3)
-			leftPrizes, errorFlush = testFlusher.Flush(ctx, prizesToAdd)
+			leftPrizes, _, errorFlush = testFlusher.Flush(ctx, prizesToAdd)
 			Expect(leftPrizes).Should(BeNil())
 			Expect(errorFlush).Should(BeNil())
 		})
@@ -57,12 +57,12 @@ var _ = Describe("Flusher", func() {
 				prize.NewPrize(2, 2, "www"), prize.NewPrize(3, 2, "www"),
 				prize.NewPrize(4, 2, "www"), prize.NewPrize(5, 2, "www")}
 
-			mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return(uint64(0), errors.New("add prize error")).MinTimes(1)
+			mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return([]uint64{0}, errors.New("add prize error")).MinTimes(1)
 		})
 
 		It("Test flushing with error at first try to add bunch", func() {
 			testFlusher = flusher.NewFlusher(mockRepo, 3)
-			leftPrizes, errorFlush = testFlusher.Flush(ctx, prizesToAdd)
+			leftPrizes, _, errorFlush = testFlusher.Flush(ctx, prizesToAdd)
 			Expect(leftPrizes).Should(BeEquivalentTo(prizesToAdd))
 			Expect(errorFlush).ShouldNot(BeNil())
 		})
@@ -75,14 +75,14 @@ var _ = Describe("Flusher", func() {
 				prize.NewPrize(2, 2, "www"), prize.NewPrize(3, 2, "www"),
 				prize.NewPrize(4, 2, "www"), prize.NewPrize(5, 2, "www")}
 			gomock.InOrder(
-				mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return(uint64(1), nil).Times(1),
-				mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return(uint64(0), errors.New("add prize error")).Times(1),
+				mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return([]uint64{1}, nil).Times(1),
+				mockRepo.EXPECT().AddPrizes(gomock.Any(), gomock.Any()).Return([]uint64{0}, errors.New("add prize error")).Times(1),
 			)
 		})
 
 		It("Test flushing with error at second try to add bunch", func() {
 			testFlusher = flusher.NewFlusher(mockRepo, 3)
-			leftPrizes, errorFlush = testFlusher.Flush(ctx, prizesToAdd)
+			leftPrizes, _, errorFlush = testFlusher.Flush(ctx, prizesToAdd)
 			Expect(len(leftPrizes)).Should(BeEquivalentTo(2))
 			Expect(errorFlush).ShouldNot(BeNil())
 		})

@@ -32,6 +32,20 @@ service OcpPrizeApi {
         };
     }
 
+    // Сreate few new prizes
+    rpc MultiCreatePrizeV1(MultiCreatePrizeV1Request) returns (MultiCreatePrizeV1Response) {
+        option (google.api.http) = {
+            post: "/v1/prizes"
+        };
+    }
+
+    // Update prize
+    rpc UpdatePrizeV1(UpdatePrizeV1Request) returns (UpdatePrizeV1Response) {
+        option (google.api.http) = {
+            post: "/v1/prizes"
+        };
+    }
+
     // Delete prize by id
     rpc RemovePrizeV1(RemovePrizeV1Request) returns (RemovePrizeV1Response) {
         option (google.api.http) = {
@@ -56,6 +70,24 @@ message CreatePrizeV1Request {
 
 message CreatePrizeV1Response {
     uint64 prize_id = 1;
+}
+
+message MultiCreatePrizeV1Request {
+    repeated Prize prizes = 1;
+}
+
+message MultiCreatePrizeV1Response {
+    repeated uint64 prize_ids = 1;
+}
+
+message UpdatePrizeV1Request {
+    uint64 id = 1;
+    string link = 2;
+    uint64 issue_id = 3;
+}
+
+message UpdatePrizeV1Response {
+    bool succeed = 1;
 }
 
 message RemovePrizeV1Request {

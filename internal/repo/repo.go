@@ -7,6 +7,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
+	"github.com/Masterminds/squirrel"
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/rs/zerolog/log"
@@ -18,7 +19,8 @@ const (
 
 // IRepo for prize
 type IRepo interface {
-	AddPrizes(ctx context.Context, prizes []prize.Prize) (uint64, error)
+	AddPrizes(ctx context.Context, prizes []prize.Prize) ([]uint64, error)
+	UpdatePrize(ctx context.Context, prize prize.Prize) error
 	RemovePrize(ctx context.Context, prizeID uint64) (bool, error)
 	DescribePrize(ctx context.Context, prizeID uint64) (*prize.Prize, error)
 	ListPrizes(ctx context.Context, limit, offset uint64) ([]prize.Prize, error)
@@ -32,10 +34,11 @@ func NewRepo(db *sqlx.DB) IRepo {
 	return &repo{db: db}
 }
 
-func (r *repo) AddPrizes(ctx context.Context, prizes []prize.Prize) (uint64, error) {
+func (r *repo) AddPrizes(ctx context.Context, prizes []prize.Prize) ([]uint64, error) {
 	log.Printf("Add Prizes to database")
 	query := sq.Insert(tableName).
 		Columns("link", "issueID").
+		Suffix("RETURNING \"id\"").
 		RunWith(r.db).
 		PlaceholderFormat(sq.Dollar)
 
@@ -44,17 +47,39 @@ func (r *repo) AddPrizes(ctx context.Context, prizes []prize.Prize) (uint64, err
 		query = query.Values(prize.Link, prize.IssueID)
 	}
 
-	result, err := query.ExecContext(ctx)
+	rows, err := query.QueryContext(ctx)
 	if err != nil {
 		log.Printf(err.Error())
-		return 0, err
+		return nil, err
 	}
-	id, err := result.LastInsertId()
+	ids := make([]uint64, 0)
+	for rows.Next() {
+		var id uint64
+		err = rows.Scan(&id)
+		if err != nil {
+			log.Printf(err.Error())
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
+}
+
+func (r *repo) UpdatePrize(ctx context.Context, prize prize.Prize) error {
+	log.Printf("Add Prizes to database")
+	query := sq.Update(tableName).
+		Set("link", prize.Link).
+		Set("issueID", prize.IssueID).
+		Where(squirrel.Eq{"id": prize.ID}).
+		RunWith(r.db).
+		PlaceholderFormat(sq.Dollar)
+
+	_, err := query.ExecContext(ctx)
 	if err != nil {
 		log.Printf(err.Error())
-		return 0, err
+		return err
 	}
-	return uint64(id), err
+	return nil
 }
 
 func (r *repo) RemovePrize(ctx context.Context, prizeID uint64) (bool, error) {
