@@ -8,6 +8,7 @@ RUN apt install -y ca-certificates
 RUN apt install -y protobuf-compiler
 
 COPY . /home/user/github.com/ozoncp/ocp-prize-api
+COPY ./config.json.template /home/user/github.com/ozoncp/ocp-prize-api/cmd/ocp-prize-api/
 
 WORKDIR /home/user/github.com/ozoncp/ocp-prize-api
 
@@ -23,7 +24,11 @@ RUN go install github.com/envoyproxy/protoc-gen-validate
 
 RUN go get github.com/opentracing/opentracing-go
 
+RUN go get github.com/jackc/pgx
+
 RUN make lint
 RUN make build
 
-EXPOSE 82
+EXPOSE 9094
+
+EXPOSE 8082

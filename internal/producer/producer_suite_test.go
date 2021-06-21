@@ -1,4 +1,4 @@
-package saver_test
+package producer_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestSaver(t *testing.T) {
+func TestProducer(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Saver Suite")
+	RunSpecs(t, "Producer Suite")
 }

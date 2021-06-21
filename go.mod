@@ -13,6 +13,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
+	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.13.0
@@ -20,6 +21,7 @@ require (
 	github.com/ozoncp/ocp-prize-api/pkg/ocp-prize-api v0.0.0-00010101000000-000000000000
 	github.com/prometheus/client_golang v1.11.0 // indirect
 	github.com/rs/zerolog v1.23.0
+	golang.org/x/tools v0.1.3 // indirect
 	google.golang.org/genproto v0.0.0-20210617175327-b9e0b3197ced // indirect
 	google.golang.org/grpc v1.38.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0 // indirect

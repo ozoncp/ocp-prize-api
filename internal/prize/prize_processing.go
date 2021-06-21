@@ -1,9 +1,13 @@
 package prize
 
-import "errors"
+import (
+	"errors"
+	"log"
+)
 
 // SplitPrizeSliceToBunches split slice with bunch size
 func SplitPrizeSliceToBunches(prizes []Prize, bunchSize int) (splittedPrizes [][]Prize, err error) {
+	log.Print("Split Prize slice to bunches")
 	if bunchSize == 0 {
 		return splittedPrizes, errors.New("size of required bunch is zero")
 	}
@@ -18,20 +22,8 @@ func SplitPrizeSliceToBunches(prizes []Prize, bunchSize int) (splittedPrizes [][
 	if len(prizes)%bunchSize != 0 {
 		splittedPrizes = append(splittedPrizes, prizes[splittedSize*bunchSize:])
 	}
-	return
-}
 
-// SlicePrizeToMap convert slice of prize to map
-func SlicePrizeToMap(prizeSlice []Prize) (prizeMap map[uint64]Prize, err error) {
-	if prizeSlice == nil {
-		return prizeMap, errors.New("nil original slice")
-	}
-	if len(prizeSlice) == 0 {
-		return prizeMap, errors.New("empty original slice")
-	}
-	prizeMap = map[uint64]Prize{}
-	for _, prize := range prizeSlice {
-		prizeMap[prize.ID] = prize
-	}
+	log.Print("Slice splitted successfully")
+
 	return
 }

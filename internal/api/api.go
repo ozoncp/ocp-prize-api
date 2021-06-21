@@ -5,6 +5,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/opentracing/opentracing-go"
+	"github.com/ozoncp/ocp-prize-api/internal/configuration"
 	"github.com/ozoncp/ocp-prize-api/internal/flusher"
 	"github.com/ozoncp/ocp-prize-api/internal/metrics"
 	"github.com/ozoncp/ocp-prize-api/internal/prize"
@@ -16,27 +17,47 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const flusherMaximumChankSize = 100
+var flusherMaximumChankSize int = 100
 
+// API struct for implementation ocp prize api
 type API struct {
 	desc.UnimplementedOcpPrizeApiServer
 	currentRepo repo.IRepo
 	producer    producer.IProducer
 }
 
-func NewOcpPrizeApi(db *sqlx.DB, producer producer.IProducer) desc.OcpPrizeApiServer {
+// NewOcpPrizeApi creates new api with setted database and producer
+func NewOcpPrizeApi(ctx context.Context, db *sqlx.DB, producer producer.IProducer) desc.OcpPrizeApiServer {
+	val := ctx.Value("configuration")
+	var conf *configuration.Configuration
+	if val != nil {
+		conf = val.(*configuration.Configuration)
+	}
+	if conf != nil {
+		flusherMaximumChankSize = conf.FlusherMaximumChankSize
+	}
 	return &API{
 		currentRepo: repo.NewRepo(db),
 		producer:    producer,
 	}
 }
 
+// CreatePrizeV1 creates prize in storage by request
 func (a *API) CreatePrizeV1(
 	ctx context.Context,
 	req *desc.CreatePrizeV1Request,
 ) (*desc.CreatePrizeV1Response, error) {
 
 	log.Printf("CreatePrizeV1 request: %s", req.String())
+
+	var span opentracing.Span
+	if span = opentracing.SpanFromContext(ctx); span != nil {
+		span, ctx = opentracing.StartSpanFromContext(ctx, "CreatePrizeV1")
+	} else {
+		span = opentracing.GlobalTracer().StartSpan("CreatePrizeV1")
+	}
+	defer span.Finish()
+
 	prizeToAdd := prize.Prize{
 		Link:    req.Link,
 		IssueID: req.IssueId,
@@ -57,13 +78,17 @@ func (a *API) CreatePrizeV1(
 	return &response, nil
 }
 
+// MultiCreatePrizeV1 creates prizes in storage by request
 func (a *API) MultiCreatePrizeV1(
 	ctx context.Context,
 	req *desc.MultiCreatePrizeV1Request,
 ) (*desc.MultiCreatePrizeV1Response, error) {
 	log.Printf("MultiCreatePrizeV1 request: %s", req.String())
-	span := opentracing.SpanFromContext(ctx)
-	if span == nil {
+
+	var span opentracing.Span
+	if span = opentracing.SpanFromContext(ctx); span != nil {
+		span, ctx = opentracing.StartSpanFromContext(ctx, "MultiCreatePrizeV1")
+	} else {
 		span = opentracing.GlobalTracer().StartSpan("MultiCreatePrizeV1")
 	}
 	defer span.Finish()
@@ -92,12 +117,22 @@ func (a *API) MultiCreatePrizeV1(
 	return &response, nil
 }
 
+// UpdatePrizeV1 update prize in storage by ID
 func (a *API) UpdatePrizeV1(
 	ctx context.Context,
 	req *desc.UpdatePrizeV1Request,
 ) (*desc.UpdatePrizeV1Response, error) {
 
 	log.Printf("UpdatePrizeV1 request: %s", req.String())
+
+	var span opentracing.Span
+	if span = opentracing.SpanFromContext(ctx); span != nil {
+		span, ctx = opentracing.StartSpanFromContext(ctx, "UpdatePrizeV1")
+	} else {
+		span = opentracing.GlobalTracer().StartSpan("UpdatePrizeV1")
+	}
+	defer span.Finish()
+
 	prizeToUpdate := prize.Prize{
 		ID:      req.Id,
 		Link:    req.Link,
@@ -119,11 +154,22 @@ func (a *API) UpdatePrizeV1(
 	return &response, nil
 }
 
+//DescribePrizeV1 gets prize by id from storage by ID
 func (a *API) DescribePrizeV1(
 	ctx context.Context,
 	req *desc.DescribePrizeV1Request,
 ) (*desc.DescribePrizeV1Response, error) {
+
 	log.Printf("DescribePrizeV1 request: %s", req.String())
+
+	var span opentracing.Span
+	if span = opentracing.SpanFromContext(ctx); span != nil {
+		span, ctx = opentracing.StartSpanFromContext(ctx, "DescribePrizeV1")
+	} else {
+		span = opentracing.GlobalTracer().StartSpan("DescribePrizeV1")
+	}
+	defer span.Finish()
+
 	if err := req.Validate(); err != nil {
 		log.Printf("invalid request: %s, error: %s", req.String(), err.Error())
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -148,11 +194,22 @@ func (a *API) DescribePrizeV1(
 	return &response, nil
 }
 
+// ListPrizeV1 gets list of prizes from storage by limit and offset
 func (a *API) ListPrizeV1(
 	ctx context.Context,
 	req *desc.ListPrizeV1Request,
 ) (*desc.ListPrizeV1Response, error) {
+
 	log.Printf("ListPrizeV1 request: %s", req.String())
+
+	var span opentracing.Span
+	if span = opentracing.SpanFromContext(ctx); span != nil {
+		span, ctx = opentracing.StartSpanFromContext(ctx, "ListPrizeV1")
+	} else {
+		span = opentracing.GlobalTracer().StartSpan("ListPrizeV1")
+	}
+	defer span.Finish()
+
 	prizes, err := a.currentRepo.ListPrizes(ctx, req.Limit, req.Offset)
 	if err != nil {
 		log.Printf("ListPrizeV1 error: %s", err.Error())
@@ -174,11 +231,22 @@ func (a *API) ListPrizeV1(
 	return &response, nil
 }
 
+// RemovePrizeV1 removes prize from storage by id
 func (a *API) RemovePrizeV1(
 	ctx context.Context,
 	req *desc.RemovePrizeV1Request,
 ) (*desc.RemovePrizeV1Response, error) {
+
 	log.Printf("RemovePrizeV1 request: %s", req.String())
+
+	var span opentracing.Span
+	if span = opentracing.SpanFromContext(ctx); span != nil {
+		span, ctx = opentracing.StartSpanFromContext(ctx, "RemovePrizeV1")
+	} else {
+		span = opentracing.GlobalTracer().StartSpan("RemovePrizeV1")
+	}
+	defer span.Finish()
+
 	if err := req.Validate(); err != nil {
 		log.Printf("invalid request: %s, error: %s", req.String(), err.Error())
 		return nil, status.Error(codes.InvalidArgument, err.Error())

@@ -1,0 +1,13 @@
+{
+    
+    "DBDriverName": "pgx",
+
+	"DBHost": "postgres",
+	"DBPort" : 5432,
+	"DBLogin": "postgres",
+	"DBPassword": "avK25",
+    "GRPCPort": ":8082",
+    "KafkaBrokers": ["kafka1:9093", "kafka2:9094"],
+    "FlusherMaximumChankSize": 100
+    
+}
