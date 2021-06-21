@@ -24,8 +24,8 @@ var (
 	dbDriverName   = "pgx"
 	dbHost         = "postgres"
 	dbPort         = 5432
-	dbLogin        = "postgres"
-	dbPassword     = "avK25"
+	dbLogin        = ""
+	dbPassword     = ""
 )
 
 func parseConfigFile(conf *configuration.Configuration, filename string) error {
@@ -46,6 +46,7 @@ func run() error {
 	if err != nil {
 		log.Printf("Error parsing config: %s", err.Error())
 		conf = nil
+		return err
 	} else {
 		log.Print("Config file loaded successfully")
 	}
@@ -60,7 +61,6 @@ func run() error {
 
 	dbInfo := fmt.Sprintf("postgres://%s:%s@%s:%d/postgres?sslmode=disable",
 		dbLogin, dbPassword, dbHost, dbPort)
-	log.Print(dbInfo)
 	sqlxDB, err := sqlx.Connect(dbDriverName, dbInfo)
 	if err != nil {
 		log.Fatalf("failed to init database: %v", err)
