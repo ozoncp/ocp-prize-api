@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var brokers = []string{"kafka:9093", "kafka:9094"}
+var brokers = []string{"kafka1:9093", "kafka2:9094"}
 
 // IProducer Implement interface for kafka producer
 type IProducer interface {

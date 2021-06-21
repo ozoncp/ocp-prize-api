@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net"
 	"os"
 
 	"google.golang.org/grpc"
 
+	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
 	api "github.com/ozoncp/ocp-prize-api/internal/api"
 	"github.com/ozoncp/ocp-prize-api/internal/configuration"
@@ -18,8 +19,13 @@ import (
 )
 
 var (
-	grpcPort     = ":8082"
-	dbDriverName = "sqlmock"
+	configFilename = "config.json.template"
+	grpcPort       = ":8082"
+	dbDriverName   = "pgx"
+	dbHost         = "postgres"
+	dbPort         = 5432
+	dbLogin        = "postgres"
+	dbPassword     = "avK25"
 )
 
 func parseConfigFile(conf *configuration.Configuration, filename string) error {
@@ -36,7 +42,7 @@ func parseConfigFile(conf *configuration.Configuration, filename string) error {
 func run() error {
 
 	conf := &configuration.Configuration{}
-	err := parseConfigFile(conf, "conf.json")
+	err := parseConfigFile(conf, configFilename)
 	if err != nil {
 		log.Printf("Error parsing config: %s", err.Error())
 		conf = nil
@@ -46,14 +52,27 @@ func run() error {
 	if conf != nil {
 		grpcPort = conf.GRPCPort
 		dbDriverName = conf.DBDriverName
+		dbHost = conf.DBHost
+		dbPort = conf.DBPort
+		dbLogin = conf.DBLogin
+		dbPassword = conf.DBPassword
 	}
 
-	var db *sql.DB
-	sqlxDB := sqlx.NewDb(db, dbDriverName)
+	dbInfo := fmt.Sprintf("postgres://%s:%s@%s:%d/postgres?sslmode=disable",
+		dbLogin, dbPassword, dbHost, dbPort)
+	log.Print(dbInfo)
+	sqlxDB, err := sqlx.Connect(dbDriverName, dbInfo)
+	if err != nil {
+		log.Fatalf("failed to init database: %v", err)
+	} else {
+		log.Print("Database connected successfully")
+	}
 
 	listen, err := net.Listen("tcp", grpcPort)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
+	} else {
+		log.Printf("Start listening port: %s", grpcPort)
 	}
 
 	s := grpc.NewServer()
@@ -65,6 +84,8 @@ func run() error {
 
 	if err := s.Serve(listen); err != nil {
 		log.Fatalf("failed to serve: %v", err)
+	} else {
+		log.Print("GRPC server started successfully")
 	}
 
 	return nil

@@ -50,10 +50,9 @@ func (a *API) CreatePrizeV1(
 
 	log.Printf("CreatePrizeV1 request: %s", req.String())
 
-	parentSpan := opentracing.SpanFromContext(ctx)
 	var span opentracing.Span
-	if parentSpan != nil {
-		span = opentracing.GlobalTracer().StartSpan("CreatePrizeV1", opentracing.ChildOf(parentSpan.Context()))
+	if span = opentracing.SpanFromContext(ctx); span != nil {
+		span, ctx = opentracing.StartSpanFromContext(ctx, "CreatePrizeV1")
 	} else {
 		span = opentracing.GlobalTracer().StartSpan("CreatePrizeV1")
 	}
@@ -86,10 +85,9 @@ func (a *API) MultiCreatePrizeV1(
 ) (*desc.MultiCreatePrizeV1Response, error) {
 	log.Printf("MultiCreatePrizeV1 request: %s", req.String())
 
-	parentSpan := opentracing.SpanFromContext(ctx)
 	var span opentracing.Span
-	if parentSpan != nil {
-		span = opentracing.GlobalTracer().StartSpan("MultiCreatePrizeV1", opentracing.ChildOf(parentSpan.Context()))
+	if span = opentracing.SpanFromContext(ctx); span != nil {
+		span, ctx = opentracing.StartSpanFromContext(ctx, "MultiCreatePrizeV1")
 	} else {
 		span = opentracing.GlobalTracer().StartSpan("MultiCreatePrizeV1")
 	}
@@ -127,10 +125,9 @@ func (a *API) UpdatePrizeV1(
 
 	log.Printf("UpdatePrizeV1 request: %s", req.String())
 
-	parentSpan := opentracing.SpanFromContext(ctx)
 	var span opentracing.Span
-	if parentSpan != nil {
-		span = opentracing.GlobalTracer().StartSpan("UpdatePrizeV1", opentracing.ChildOf(parentSpan.Context()))
+	if span = opentracing.SpanFromContext(ctx); span != nil {
+		span, ctx = opentracing.StartSpanFromContext(ctx, "UpdatePrizeV1")
 	} else {
 		span = opentracing.GlobalTracer().StartSpan("UpdatePrizeV1")
 	}
@@ -165,10 +162,9 @@ func (a *API) DescribePrizeV1(
 
 	log.Printf("DescribePrizeV1 request: %s", req.String())
 
-	parentSpan := opentracing.SpanFromContext(ctx)
 	var span opentracing.Span
-	if parentSpan != nil {
-		span = opentracing.GlobalTracer().StartSpan("DescribePrizeV1", opentracing.ChildOf(parentSpan.Context()))
+	if span = opentracing.SpanFromContext(ctx); span != nil {
+		span, ctx = opentracing.StartSpanFromContext(ctx, "DescribePrizeV1")
 	} else {
 		span = opentracing.GlobalTracer().StartSpan("DescribePrizeV1")
 	}
@@ -206,10 +202,9 @@ func (a *API) ListPrizeV1(
 
 	log.Printf("ListPrizeV1 request: %s", req.String())
 
-	parentSpan := opentracing.SpanFromContext(ctx)
 	var span opentracing.Span
-	if parentSpan != nil {
-		span = opentracing.GlobalTracer().StartSpan("ListPrizeV1", opentracing.ChildOf(parentSpan.Context()))
+	if span = opentracing.SpanFromContext(ctx); span != nil {
+		span, ctx = opentracing.StartSpanFromContext(ctx, "ListPrizeV1")
 	} else {
 		span = opentracing.GlobalTracer().StartSpan("ListPrizeV1")
 	}
@@ -244,10 +239,9 @@ func (a *API) RemovePrizeV1(
 
 	log.Printf("RemovePrizeV1 request: %s", req.String())
 
-	parentSpan := opentracing.SpanFromContext(ctx)
 	var span opentracing.Span
-	if parentSpan != nil {
-		span = opentracing.GlobalTracer().StartSpan("RemovePrizeV1", opentracing.ChildOf(parentSpan.Context()))
+	if span = opentracing.SpanFromContext(ctx); span != nil {
+		span, ctx = opentracing.StartSpanFromContext(ctx, "RemovePrizeV1")
 	} else {
 		span = opentracing.GlobalTracer().StartSpan("RemovePrizeV1")
 	}
