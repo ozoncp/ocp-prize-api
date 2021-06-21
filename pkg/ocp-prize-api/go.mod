@@ -1,3 +1,3 @@
-module ocp-prize-api
+module github.com/ozoncp/ocp-prize-api/pkg/ocp-prize-api
 
-go 1.13
+go 1.16

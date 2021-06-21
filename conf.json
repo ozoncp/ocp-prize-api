@@ -1,0 +1,6 @@
+{
+    "DBDriverName": "sqlmock",
+    "GRPCPort": ":8082",
+    "KafkaBrokers": ["kafka:9092", "kafka:9094"],
+    "FlusherMaximumChankSize": 100
+}

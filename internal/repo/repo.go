@@ -30,10 +30,12 @@ type repo struct {
 	db *sqlx.DB
 }
 
+// NewRepo creates new repo with setted database
 func NewRepo(db *sqlx.DB) IRepo {
 	return &repo{db: db}
 }
 
+// AddPrizes to database
 func (r *repo) AddPrizes(ctx context.Context, prizes []prize.Prize) ([]uint64, error) {
 	log.Printf("Add Prizes to database")
 	query := sq.Insert(tableName).
@@ -65,6 +67,7 @@ func (r *repo) AddPrizes(ctx context.Context, prizes []prize.Prize) ([]uint64, e
 	return ids, nil
 }
 
+// UpdatePrize in database
 func (r *repo) UpdatePrize(ctx context.Context, prize prize.Prize) error {
 	log.Printf("Add Prizes to database")
 	query := sq.Update(tableName).
@@ -82,6 +85,7 @@ func (r *repo) UpdatePrize(ctx context.Context, prize prize.Prize) error {
 	return nil
 }
 
+// RemovePrize from database
 func (r *repo) RemovePrize(ctx context.Context, prizeID uint64) (bool, error) {
 
 	log.Printf("Remove Prize from database")
@@ -97,6 +101,7 @@ func (r *repo) RemovePrize(ctx context.Context, prizeID uint64) (bool, error) {
 	return found, err
 }
 
+// DescribePrize gets prize from database by ID
 func (r *repo) DescribePrize(ctx context.Context, prizeID uint64) (*prize.Prize, error) {
 
 	log.Printf("Describe prize")
@@ -115,6 +120,7 @@ func (r *repo) DescribePrize(ctx context.Context, prizeID uint64) (*prize.Prize,
 	return &prize, nil
 }
 
+// ListPrizes gets list of prises from database
 func (r *repo) ListPrizes(ctx context.Context, limit, offset uint64) ([]prize.Prize, error) {
 
 	log.Printf("List Prizes")
